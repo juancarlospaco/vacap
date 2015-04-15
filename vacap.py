@@ -21,7 +21,6 @@ import signal
 import sys
 import time
 from datetime import datetime
-from os import path
 from shutil import copy2, make_archive
 from tempfile import gettempdir
 
@@ -87,7 +86,6 @@ class Backuper(QProgressDialog):
 
     def make_backup(self):
         # try to make backups
-        total = len(self.origins)
         try:
             # iterate over lists of folders to backup
             for folder_to_backup in self.origins:
