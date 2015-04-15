@@ -17,17 +17,17 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 # imports
 import logging as log
 import os
+import signal
 import sys
 import time
 from datetime import datetime
 from os import path
-from tempfile import gettempdir
-import signal
 from shutil import make_archive
+from tempfile import gettempdir
 
-from PyQt5.QtGui import QFont, QIcon, QStyle
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QSystemTrayIcon)
+                             QStyle, QSystemTrayIcon)
 
 
 ##############################################################################
