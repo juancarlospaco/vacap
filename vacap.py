@@ -116,7 +116,7 @@ class MainWindow(QSystemTrayIcon):
 
     def __init__(self, icon, parent=None):
         """Tray icon main widget."""
-        super(MainWindow, self).__init__(self, icon, parent)
+        super(MainWindow, self).__init__(icon, parent)
         log.info("Iniciando el programa Vacap...")
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
