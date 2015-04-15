@@ -99,8 +99,7 @@ class Backuper(QProgressDialog):
                 self.setValue(percentage)
                 log.info("folder_to_backup: {}, self.destination {}".format(
                     folder_to_backup, self.destination))
-                make_archive(folder_to_backup, "zip", self.destination,
-                             logger=log)
+                make_archive(folder_to_backup, "zip", self.destination)
         except Exception as reason:
             log.warning(reason)
         finally:
