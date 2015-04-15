@@ -102,6 +102,9 @@ class Backuper(QProgressDialog):
                 copy2(folder_to_backup + ".zip", self.destination)
         except Exception as reason:
             log.warning(reason)
+        else:
+            QMessageBox.information(self, __doc__.title(),
+                                    "Copia de Seguridad Backup Termino bien.")
         finally:
             log.info("Finished BackUp from {} to {}.".format(
                 self.origins, self.destination))
