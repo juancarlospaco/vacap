@@ -22,7 +22,7 @@ import sys
 import time
 from datetime import datetime
 from os import path
-from shutil import make_archive
+from shutil import copy2, make_archive
 from tempfile import gettempdir
 
 from PyQt5.QtGui import QFont, QIcon
@@ -97,9 +97,11 @@ class Backuper(QProgressDialog):
                     len(self.origins) - self.origins.index(folder_to_backup),
                     percentage))
                 self.setValue(percentage)
-                log.info("folder_to_backup: {}, self.destination {}".format(
-                    folder_to_backup, self.destination))
-                make_archive(folder_to_backup, "zip", self.destination)
+                log.info("Folder to backup: {}".format(folder_to_backup))
+                make_archive(folder_to_backup, "zip", folder_to_backup,
+                             logger=log)
+                log.info("Copying to destination: {}".format(self.destination))
+                copy2(folder_to_backup + ".zip", self.destination)
         except Exception as reason:
             log.warning(reason)
         finally:
