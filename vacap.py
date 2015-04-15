@@ -65,7 +65,7 @@ class Backuper(QProgressDialog):
         <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
         self.show()
         self.make_backup()
-        self.exec_()
+        # self.exec_()
 
     def seconds_time_to_human_str(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
@@ -122,7 +122,6 @@ class MainWindow(QSystemTrayIcon):
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
-        # self.setIcon(QIcon("edit-new-file"))
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
         traymenu.setFont(QFont('Verdana', 20))
         self.setContextMenu(traymenu)
@@ -193,7 +192,7 @@ def main():
     app.setApplicationName("vacap")
     app.setOrganizationName("vacap")
     app.setOrganizationDomain("vacap")
-    icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
+    icon = QIcon(app.style().standardPixmap(QStyle.SP_DriveFDIcon))
     app.setWindowIcon(icon)
     win = MainWindow(icon)
     win.show()
