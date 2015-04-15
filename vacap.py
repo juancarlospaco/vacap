@@ -88,7 +88,6 @@ class Backuper(QProgressDialog):
         try:
             # iterate over lists of folders to backup
             for folder_to_backup in self.origins:
-                log.info("BackUp folder {}.".format(folder_to_backup))
                 percentage = int(self.origins.index(folder_to_backup) /
                                  len(self.origins) * 100)
                 self.setLabelText(self.template.format(
@@ -98,6 +97,8 @@ class Backuper(QProgressDialog):
                     len(self.origins) - self.origins.index(folder_to_backup),
                     percentage))
                 self.setValue(percentage)
+                log.info("folder_to_backup: {}, self.destination {}".format(
+                    folder_to_backup, self.destination))
                 make_archive(folder_to_backup, "zip", self.destination,
                              logger=log)
         except Exception as reason:
