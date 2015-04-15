@@ -24,7 +24,6 @@ from os import path
 from tempfile import gettempdir
 import signal
 from shutil import make_archive
-import winsound
 
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
@@ -34,7 +33,7 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
 ##############################################################################
 
 MAKE_BACKUP_FROM = [
-    "C:/Users/Administrator/Desktop",
+    "C:/Users/Administrator",
     "",
     "",
 ]
@@ -104,23 +103,6 @@ class Backuper(QProgressDialog):
         finally:
             log.info("Finished BackUp from {} to {}.".format(
                 self.origins, self.destination))
-            self.setValue(100)
-            QMessageBox.information(self, __doc__.title(),
-                                    "<b>Backup Terminado Correctamente !.")
-            winsound.Beep(2500, 1000)
-
-    def update_download_progress(self, bytesReceived, bytesTotal):
-        """Calculate statistics and update the UI with them."""
-        # Calculate download speed values, with precision from Kb/s to Gb/s
-        elapsed = time.clock()
-        percentage = int(100.0 * bytesReceived // bytesTotal)
-        self.setLabelText(self.template.format(
-            self._url.lower()[:99], self._dst.lower()[:99],
-            self._date, datetime.now().isoformat()[:-7],
-            self.seconds_time_to_human_string(time.time() - self._time),
-            self.seconds_time_to_human_string(missing),
-            downloaded_MB, total_data_MB, download_speed, percentage))
-        self.setValue(percentage)
 
 
 ###############################################################################
