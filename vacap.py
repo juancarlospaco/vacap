@@ -66,7 +66,6 @@ class Backuper(QProgressDialog):
         self.setWindowTitle(__doc__)
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self.destination, self.origins = destination, origins
-        log.debug("Copying from {} to {}.".format(self._url, self._dst))
         self.template = """<h3>Copiando</h3><hr><table>
         <tr><td><b>Desde:</b></td>      <td>{}</td>
         <tr><td><b>Hacia:  </b></td>      <td>{}</td> <tr>
@@ -94,7 +93,7 @@ class Backuper(QProgressDialog):
         human_time_string += "%02d Segundos" % seconds
         return human_time_string
 
-    def make_backup(self, destination=self.destination, origins=self.origins):
+    def make_backup(self):
         # try to make backups
         total = len(self.origins)
         try:
@@ -116,7 +115,7 @@ class Backuper(QProgressDialog):
             log.warning(reason)
         finally:
             log.info("Finished BackUp from {} to {}.".format(
-                MAKE_BACKUP_FROM , backup_destination))
+                self.origins, self.destination))
             self.setValue(100)
             QMessageBox.information(self, __doc__.title(),
                                     "<b>Backup Terminado Correctamente !.")
@@ -175,11 +174,11 @@ class MainWindow(QSystemTrayIcon):
         # get date and time for folder name
         t = datetime.now().isoformat().lower().split(".")[0].replace(":", "_")
         # prepare a new folder with date-time inside destination folder
-        log.info("Folder {} is OK for BackUp.".format(self.destination)
+        log.info("Folder {} is OK for BackUp.".format(self.destination))
         self.destination = os.path.join(SAVE_BACKUP_TO, t)
         if not os.path.isdir(self.destination):
             os.mkdir(self.destination)
-            log.info("Destination Folder now is {}.".format(self.destination)
+            log.info("Destination Folder now is {}.".format(self.destination))
 
     def check_origins_folders(self):
         """Check origin folders."""
