@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
 ##############################################################################
 
 MAKE_BACKUP_FROM = [
-    "",
+    "C:/Users/Administrator/Desktop",
     "",
     "",
 ]
@@ -63,8 +63,8 @@ class Backuper(QProgressDialog):
         <tr><td><b>Faltante:</b></td> <td>{}</td> <tr>
         <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>"""
         self.show()
-        self.exec_()
         self.make_backup()
+        self.exec_()
 
     def seconds_time_to_human_str(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
@@ -191,6 +191,7 @@ class MainWindow(QSystemTrayIcon):
             Backuper(destination=self.destination, origins=self.origins)
         else:
             log.critical("Vacap is not properly configured, Exiting...")
+            sys.exit(1)
 
 
 ###############################################################################
@@ -198,7 +199,9 @@ class MainWindow(QSystemTrayIcon):
 
 def main():
     """Main Loop."""
-    log.basicConfig(level=-1, format="%(levelname)s:%(asctime)s %(message)s")
+    log.basicConfig(
+        level=-1, format="%(levelname)s:%(asctime)s %(message)s",
+        filemode="w", filename=os.path.join(gettempdir(), "vacap.log"))
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
