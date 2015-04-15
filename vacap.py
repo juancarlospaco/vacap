@@ -65,7 +65,6 @@ class Backuper(QProgressDialog):
         <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
         self.show()
         self.make_backup()
-        # self.exec_()
 
     def seconds_time_to_human_str(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
@@ -101,6 +100,7 @@ class Backuper(QProgressDialog):
                 make_archive(folder_to_backup, "zip", folder_to_backup,
                              logger=log)
                 log.info("Copying to destination: {}".format(self.destination))
+                time.sleep(3)
                 copy2(folder_to_backup + ".zip", self.destination)
         except Exception as reason:
             log.warning(reason)
@@ -169,10 +169,12 @@ class MainWindow(QSystemTrayIcon):
 
     def backup(self):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
+        self.setDisabled(True)
         self.check_destination_folder()
         if self.check_origins_folders():
             log.info("Starting to BackUp folders...")
             Backuper(destination=self.destination, origins=self.origins)
+            self.setDisabled(False)
         else:
             log.critical("Vacap is not properly configured, Exiting...")
             sys.exit(1)
