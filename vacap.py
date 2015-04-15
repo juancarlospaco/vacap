@@ -149,7 +149,7 @@ class MainWindow(QSystemTrayIcon):
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
         traymenu.setFont(QFont('Oxygen', 20))
         self.setContextMenu(traymenu)
-        log.info("Finalizado el inicio del programa Vacap.")
+        log.info("Inicio el programa Vacap.")
         self.show()
 
     def check_destination_folder(self):
@@ -169,10 +169,10 @@ class MainWindow(QSystemTrayIcon):
         t = datetime.now().isoformat().lower().split(".")[0].replace(":", "_")
         # prepare a new folder with date-time inside destination folder
         log.info("Folder {} is OK for BackUp.".format(self.destination))
-        self.destination = os.path.join(SAVE_BACKUP_TO, t)
+        self.destination = os.path.join(self.destination, t)
         if not os.path.isdir(self.destination):
             os.mkdir(self.destination)
-            log.info("Destination Folder now is {}.".format(self.destination))
+            log.info("Created New Folder {}.".format(self.destination))
 
     def check_origins_folders(self):
         """Check origin folders."""
@@ -188,13 +188,14 @@ class MainWindow(QSystemTrayIcon):
                 self.origins.remove(folder_to_check)
             else:
                 log.info("Folder {} is OK to BackUp.".format(folder_to_check))
+        return bool(len(self.origins))
 
     def backup(self):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
         self.check_destination_folder()
-        self.check_origins_folders()
-        log.info("Starting to BackUp folders...")
-        Backuper(destination=self.destination, origins=self.origins)
+        if self.check_origins_folders():
+            log.info("Starting to BackUp folders...")
+            Backuper(destination=self.destination, origins=self.origins)
 
 
 ###############################################################################
