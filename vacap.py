@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
 
 
 MAKE_BACKUP_FROM = [
-    "C:/Users/Administrator",
+    "C:/Users/Administrator/Desktop",
     "",
     "",
 ]
