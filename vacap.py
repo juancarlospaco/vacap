@@ -44,11 +44,6 @@ SAVE_BACKUP_TO = ""
 ##############################################################################
 
 
-QSS_STYLE = """QWidget { background-color: #302F2F }
-QMenu { border: 1px solid gray; color: silver; font-weight: light }
-QMenu::item { font-size: 20px; padding:0; margin:0; margin: 0; border: 0 }"""
-
-
 class Backuper(QProgressDialog):
 
     """Backuper Dialog with complete informations and progress bar."""
@@ -144,7 +139,6 @@ class MainWindow(QSystemTrayIcon):
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
         self.setIcon(QIcon("edit-new-file"))
-        #traymenu.setStyleSheet(QSS_STYLE.strip())
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
         traymenu.setFont(QFont('Oxygen', 20))
         self.setContextMenu(traymenu)
@@ -195,6 +189,8 @@ class MainWindow(QSystemTrayIcon):
         if self.check_origins_folders():
             log.info("Starting to BackUp folders...")
             Backuper(destination=self.destination, origins=self.origins)
+        else:
+            log.critical("Vacap is not properly configured, Exiting...")
 
 
 ###############################################################################
