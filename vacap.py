@@ -25,7 +25,7 @@ from tempfile import gettempdir
 import signal
 from shutil import make_archive
 
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QStyle
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QSystemTrayIcon)
 
@@ -117,7 +117,7 @@ class MainWindow(QSystemTrayIcon):
         super(MainWindow, self).__init__()
         log.info("Iniciando el programa Vacap...")
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
-        self.setIcon(QIcon.fromTheme("edit-paste"))
+        self.setIcon(QApplication().style().standardPixmap(QStyle.SP_FileIcon))
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
         self.setIcon(QIcon("edit-new-file"))
@@ -191,7 +191,7 @@ def main():
     app.setApplicationName("vacap")
     app.setOrganizationName("vacap")
     app.setOrganizationDomain("vacap")
-    app.setWindowIcon(QIcon.fromTheme("edit-new-file"))
+    app.setWindowIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())
