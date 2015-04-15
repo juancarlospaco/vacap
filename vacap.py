@@ -44,16 +44,10 @@ SAVE_BACKUP_TO = ""
 ##############################################################################
 
 
-QSS_STYLE = """
-QWidget { background-color: #302F2F; border-radius: 9px }
-QWidget:item:selected { background-color: skyblue }
+QSS_STYLE = """QWidget { background-color: #302F2F; border-radius: 9px }
 QMenu { border: 1px solid gray; color: silver; font-weight: light }
 QMenu::item { font-size: 20px; padding:0; margin:0; margin: 0; border: 0 }
-QMenu::item:selected { color: black }
-"""
-
-
-###############################################################################
+QMenu::item:selected { color: black; background-color: skyblue }"""
 
 
 class Backuper(QProgressDialog):
@@ -74,9 +68,9 @@ class Backuper(QProgressDialog):
         <tr><td><b>Tiempo Transcurrido:</b></td>   <td>{}</td>
         <tr><td><b>Faltante:</b></td> <td>{}</td> <tr>
         <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>"""
-        self.make_backup()
         self.show()
         self.exec_()
+        self.make_backup()
 
     def seconds_time_to_human_str(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
