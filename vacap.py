@@ -36,7 +36,6 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
 MAKE_BACKUP_FROM = [
     "C:/Users/Administrator/Desktop",
     "",
-    "",
 ]
 SAVE_BACKUP_TO = ""
 
@@ -153,16 +152,18 @@ class MainWindow(QSystemTrayIcon):
     def check_origins_folders(self):
         """Check origin folders."""
         log.info("Checking origins folders {}.".format(self.origins))
-        self.origins = list(set(self.origins))  # remove repeated items if any
+        # remove repeated items if any
+        self.origins = list(set(self.origins))
         for folder_to_check in self.origins:
-            # if folder is not a folder or is not readable
+            # if folder is not a folder
             if not os.path.isdir(folder_to_check):
                 log.critical("Folder {} dont exist.".format(folder_to_check))
                 self.origins.remove(folder_to_check)
+            # if folder is not readable
             elif not os.access(folder_to_check, os.R_OK):
                 log.critical("Folder {} not Readable.".format(folder_to_check))
                 self.origins.remove(folder_to_check)
-            else:
+            else:  # folder is ok
                 log.info("Folder {} is OK to BackUp.".format(folder_to_check))
         return bool(len(self.origins))
 
@@ -185,7 +186,7 @@ class MainWindow(QSystemTrayIcon):
 def main():
     """Main Loop."""
     log.basicConfig(
-        level=-1, format="%(levelname)s:%(asctime)s %(message)s",
+        level=-1, format="%(levelname)s:%(asctime)s %(message)s %(lineno)s",
         filemode="w", filename=os.path.join(gettempdir(), "vacap.log"))
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
