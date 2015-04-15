@@ -32,6 +32,7 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
 
 ##############################################################################
 
+
 MAKE_BACKUP_FROM = [
     "C:/Users/Administrator",
     "",
@@ -53,14 +54,15 @@ class Backuper(QProgressDialog):
         self.setWindowTitle(__doc__)
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self.destination, self.origins = destination, origins
-        self.template = """<h3>Copiando</h3><hr><table>
+        self.template = """<h3>Copia de Seguridad BackUp</h3><hr><table>
         <tr><td><b>Desde:</b></td>      <td>{}</td>
         <tr><td><b>Hacia:  </b></td>      <td>{}</td> <tr>
         <tr><td><b>Tiempo de Inicio:</b></td>   <td>{}</td>
         <tr><td><b>Tiempo Actual:</b></td>    <td>{}</td> <tr>
         <tr><td><b>Tiempo Transcurrido:</b></td>   <td>{}</td>
         <tr><td><b>Faltante:</b></td> <td>{}</td> <tr>
-        <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>"""
+        <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>
+        <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
         self.show()
         self.make_backup()
         self.exec_()
@@ -117,7 +119,8 @@ class MainWindow(QSystemTrayIcon):
         super(MainWindow, self).__init__()
         log.info("Iniciando el programa Vacap...")
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
-        self.setIcon(QApplication().style().standardPixmap(QStyle.SP_FileIcon))
+        self.setIcon(QIcon(
+            QApplication().style().standardPixmap(QStyle.SP_FileIcon)))
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
         self.setIcon(QIcon("edit-new-file"))
@@ -191,7 +194,7 @@ def main():
     app.setApplicationName("vacap")
     app.setOrganizationName("vacap")
     app.setOrganizationDomain("vacap")
-    app.setWindowIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
+    app.setWindowIcon(QIcon(app.style().standardPixmap(QStyle.SP_FileIcon)))
     win = MainWindow()
     win.show()
     sys.exit(app.exec_())
