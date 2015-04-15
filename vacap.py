@@ -114,18 +114,16 @@ class MainWindow(QSystemTrayIcon):
 
     """Main widget for Vacap, not really a window since not needed."""
 
-    def __init__(self):
+    def __init__(self, icon, parent=None):
         """Tray icon main widget."""
-        super(MainWindow, self).__init__()
+        super(MainWindow, self).__init__(self, icon, parent)
         log.info("Iniciando el programa Vacap...")
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
-        self.setIcon(QIcon(
-            QApplication().style().standardPixmap(QStyle.SP_FileIcon)))
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
         self.setIcon(QIcon("edit-new-file"))
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
-        traymenu.setFont(QFont('Oxygen', 20))
+        traymenu.setFont(QFont('Verdana', 20))
         self.setContextMenu(traymenu)
         log.info("Inicio el programa Vacap.")
         self.show()
@@ -194,8 +192,9 @@ def main():
     app.setApplicationName("vacap")
     app.setOrganizationName("vacap")
     app.setOrganizationDomain("vacap")
-    app.setWindowIcon(QIcon(app.style().standardPixmap(QStyle.SP_FileIcon)))
-    win = MainWindow()
+    icon = QIcon(app.style().standardPixmap(QStyle.SP_FileIcon))
+    app.setWindowIcon(icon)
+    win = MainWindow(icon)
     win.show()
     sys.exit(app.exec_())
 
