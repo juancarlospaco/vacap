@@ -1,10 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""Vacap."""
+
+
+##############################################################################
+# Instalar:
+# https://www.python.org/downloads/windows  (Elejir Python 3.x.x)
+# http://www.qt.io/download-open-source     (Elejir Python 5.x.x)
+# http://www.riverbankcomputing.com/software/pyqt/download5
+
+
+# Configurar:
+MAKE_BACKUP_FROM = [
+    "C:/Users/Administrator/Desktop",
+    "",
+]
+SAVE_BACKUP_TO = ""
+
+
+##############################################################################
 
 
 # metadata
-"""Vacap."""
-__package__ = "vacap"
 __version__ = '0.0.1'
 __license__ = ' GPLv3+ LGPLv3+ '
 __author__ = ' Juan Carlos '
@@ -29,22 +46,7 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
 
 
-##############################################################################
-# Instalar:
-# https://www.python.org/downloads/windows  (Elejir Python 3.x.x)
-# http://www.qt.io/download-open-source     (Elejir Python 5.x.x)
-# http://www.riverbankcomputing.com/software/pyqt/download5
-
-
-# Configurar:
-MAKE_BACKUP_FROM = [
-    "C:/Users/Administrator/Desktop",
-    "",
-]
-SAVE_BACKUP_TO = ""
-
-
-##############################################################################
+#
 
 
 class Backuper(QProgressDialog):
@@ -85,7 +87,7 @@ class Backuper(QProgressDialog):
         return human_time_string
 
     def make_backup(self):
-        # try to make backups
+        """Try to make backups."""
         try:
             # iterate over lists of folders to backup
             for folder_to_backup in self.origins:
@@ -113,7 +115,7 @@ class Backuper(QProgressDialog):
                 self.origins, self.destination))
 
 
-###############################################################################
+#
 
 
 class MainWindow(QSystemTrayIcon):
@@ -186,7 +188,7 @@ class MainWindow(QSystemTrayIcon):
             sys.exit(1)
 
 
-###############################################################################
+#
 
 
 def main():
