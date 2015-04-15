@@ -44,10 +44,9 @@ SAVE_BACKUP_TO = ""
 ##############################################################################
 
 
-QSS_STYLE = """QWidget { background-color: #302F2F; border-radius: 9px }
+QSS_STYLE = """QWidget { background-color: #302F2F }
 QMenu { border: 1px solid gray; color: silver; font-weight: light }
-QMenu::item { font-size: 20px; padding:0; margin:0; margin: 0; border: 0 }
-QMenu::item:selected { color: black; background-color: skyblue }"""
+QMenu::item { font-size: 20px; padding:0; margin:0; margin: 0; border: 0 }"""
 
 
 class Backuper(QProgressDialog):
@@ -145,7 +144,7 @@ class MainWindow(QSystemTrayIcon):
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
         self.setIcon(QIcon("edit-new-file"))
-        traymenu.setStyleSheet(QSS_STYLE.strip())
+        #traymenu.setStyleSheet(QSS_STYLE.strip())
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
         traymenu.setFont(QFont('Oxygen', 20))
         self.setContextMenu(traymenu)
