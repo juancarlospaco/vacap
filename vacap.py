@@ -122,7 +122,7 @@ class MainWindow(QSystemTrayIcon):
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
-        self.setIcon(QIcon("edit-new-file"))
+        # self.setIcon(QIcon("edit-new-file"))
         traymenu.addAction(" Hacer Backup ", lambda: self.backup())
         traymenu.setFont(QFont('Verdana', 20))
         self.setContextMenu(traymenu)
