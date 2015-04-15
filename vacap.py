@@ -6,7 +6,7 @@
 ##############################################################################
 # Instalar:
 # https://www.python.org/downloads/windows  (Elejir Python 3.x.x)
-# http://www.qt.io/download-open-source     (Elejir Python 5.x.x)
+# http://www.qt.io/download-open-source     (Elejir Qt 5.x.x)
 # http://www.riverbankcomputing.com/software/pyqt/download5
 
 
