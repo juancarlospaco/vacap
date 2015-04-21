@@ -1,5 +1,8 @@
 # vacap
 
+Es un sencillo y no por eso, menos potente gestor de backups, pensado para usuarios poco experimentados a la hora de instarlas aplicaciones. "VACAP" funciona en, Wind y Linux.
+
+
 Links para bajar paquetes para correr el "Vacap" 
 
 Hay que tener en cuenta que OS se está utilizando su arquitectura y versión. Iportante!!
