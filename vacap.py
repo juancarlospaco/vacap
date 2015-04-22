@@ -50,6 +50,7 @@ from tempfile import gettempdir
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
+from PyQt5.QtCore import Qt
 
 
 ##############################################################################
@@ -82,7 +83,7 @@ class Backuper(QProgressDialog):
         self.setWindowTitle(__doc__)
         self.setWindowIcon(
             QIcon(QApplication.style().standardPixmap(QStyle.SP_DriveFDIcon)))
-        self.setWindowFlags(0x00000800)  # Qt.FramelessWindowHint
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.setCancelButton(None)
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self.destination, self.origins = destination, origins
