@@ -160,7 +160,8 @@ class Backuper(QProgressDialog):
         with open(filename, "rb") as zip_file:
             checksum = sha1(zip_file.read()).hexdigest()
             log.info("Calculating SHA1 Checksum: {}".format(checksum))
-        checksum_file = checksum + ".sha1"  # filename IS the checksum hash
+        checksum_file = os.path.join(  # filename IS the checksum hash
+            os.path.dirname(filename), checksum + ".sha1")
         open(checksum_file, "w").close()  # Mimic Linux 'touch', empty file
         log.info("Making SHA1 Checksum {} Hidden.".format(checksum_file))
         ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
