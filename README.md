@@ -26,6 +26,8 @@ http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.
 
 
 
+
+
 **Crear un archivo .bat para iniciar "vacap"**
 
 con las siguientes lineas:
