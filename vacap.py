@@ -50,6 +50,7 @@ from tempfile import gettempdir
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
+from PyQt5.QtCore import QTimer
 
 
 ##############################################################################
@@ -99,7 +100,12 @@ class Backuper(QProgressDialog):
         <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
         self.show()
         self.center()
-        self.make_backup()
+        self.setValue(0)
+        self.setLabelText(self.template)
+        self._timer = QTimer(self)
+        self._timer.setSingleShot(True)
+        self._timer.timeout.connect(self.make_backup)
+        self._timer.start(1000)
 
     def center(self):
         """Center the Window on Current Screen,with MultiMonitor support."""
@@ -137,7 +143,8 @@ class Backuper(QProgressDialog):
         """Try to copy ZIP file to final destination."""
         log.info("Checking if {} has Free Space.".format(self.destination))
         free_space_on_disk = get_free_space_on_disk_on_gb(self.destination)
-        size_of_the_zip_file = os.stat(filename).st_size / 1024 / 1024 / 1024
+        size_of_the_zip_file = int(os.stat(filename).st_size
+                                   / 1024 / 1024 / 1024)
         log.info("Free Space: ~{} GigaBytes.".format(free_space_on_disk))
         log.info("Size of ZIP: ~{} GigaBytes.".format(size_of_the_zip_file))
         if free_space_on_disk > size_of_the_zip_file:
