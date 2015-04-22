@@ -14,8 +14,9 @@
 
 # Configurar:
 MAKE_BACKUP_FROM = [
-    r"C:\Users\Administrator\Desktop",
-    "",
+    r"C:\Python34",
+    r"C:\Qt",
+    r"",
 ]
 SAVE_BACKUP_TO = ""
 
@@ -28,9 +29,6 @@ __version__ = '0.0.1'
 __license__ = ' BSD '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
-__url__ = 'https://github.com/juancarlospaco/vacap'
-__source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
-              'vacap/master/vacap.py')
 
 
 # imports
@@ -194,9 +192,12 @@ class Backuper(QProgressDialog):
         except Exception as reason:
             log.warning(reason)
         else:
+            self.setValue(100)
+            QApplication.processEvents()  # Forces the UI to Update
             QMessageBox.information(self, __doc__.title(),
                                     "Copia de Seguridad Backup Termino bien.")
         finally:
+            QApplication.processEvents()  # Forces the UI to Update
             log.info("Finished BackUp from {} to {}.".format(
                 self.origins, self.destination))
 
