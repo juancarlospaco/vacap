@@ -10,14 +10,11 @@
 # https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
 # http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
 # http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
-#
-# Opcional: (Para chequear integridad de archivos ZIP con checksum SHA1)
-# http://www.microsoft.com/en-us/download/details.aspx?id=11533
 
 
 # Configurar:
 MAKE_BACKUP_FROM = [
-    r"C:\Users\Administrador\Desktop",
+    r"C:\Users\Administrator\Desktop",
     "",
 ]
 SAVE_BACKUP_TO = ""
@@ -160,10 +157,11 @@ class Backuper(QProgressDialog):
         with open(filename, "rb") as zip_file:
             checksum = sha1(zip_file.read()).hexdigest()
             log.info("Calculating SHA1 Checksum: {}".format(checksum))
-        checksum_file = os.path.join(  # filename IS the checksum hash
-            os.path.dirname(filename), checksum + ".sha1")
-        open(checksum_file, "w").close()  # Mimic Linux 'touch', empty file
-        log.info("Making SHA1 Checksum {} Hidden.".format(checksum_file))
+        checksum_file = filename + ".bat"
+        with open(checksum_file, "w") as checksum_filename:
+            checksum_filename.write("""echo Valid SHA1 Checksum: {}
+                certutil -hashfile '{}' sha1""".format(filename, checksum))
+        log.info("Making SHA1 Checksum *.BAT {} Hidden".format(checksum_file))
         ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
                                                   0x02)  # make hidden file
 
