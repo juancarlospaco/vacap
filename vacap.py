@@ -17,7 +17,7 @@
 
 # Configurar:
 MAKE_BACKUP_FROM = [
-    "C:/Users/Administrador/Desktop",
+    r"C:\Users\Administrador\Desktop",
     "",
 ]
 SAVE_BACKUP_TO = ""
@@ -84,7 +84,7 @@ class Backuper(QProgressDialog):
         super(Backuper, self).__init__(parent)
         self.setWindowTitle(__doc__)
         self.setWindowIcon(
-            QApplication.style().standardPixmap(QStyle.SP_DriveFDIcon))
+            QIcon(QApplication.style().standardPixmap(QStyle.SP_DriveFDIcon)))
         # self.setWindowFlags(Qt.Window |  Qt.CustomizeWindowHint |
         #                    Qt.WindowTitleHint | Qt::WindowMinMaxButtonsHint)
         # Qt.FramelessWindow
@@ -155,14 +155,14 @@ class Backuper(QProgressDialog):
 
     def generate_checksum(self, filename):
         """Generate a checksum using SHA1."""
-        log.info("Making archived ZIP file Read-Only.")
+        log.info("Making {} Read-Only.".format(filename))
         os.chmod(filename, S_IREAD)
-        log.info("Calculating SHA1 Checksum from Data from ZIP file.")
         with open(filename, "rb") as zip_file:
             checksum = sha1(zip_file.read()).hexdigest()
+            log.info("Calculating SHA1 Checksum: {}".format(checksum))
         checksum_file = checksum + ".sha1"  # filename IS the checksum hash
         open(checksum_file, "w").close()  # Mimic Linux 'touch', empty file
-        log.info("Making SHA1 Checksum file Hidden.")
+        log.info("Making SHA1 Checksum {} Hidden.".format(checksum_file))
         ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
                                                   0x02)  # make hidden file
 
@@ -274,7 +274,6 @@ class MainWindow(QSystemTrayIcon):
 
 def main():
     """Main Loop."""
-    os.setpriority(os.PRIO_PROCESS, os.getpid(), 20)  # I/O nice smooth
     log_file_path = os.path.join(gettempdir(), "vacap.log")
     log.basicConfig(level=-1, filemode="w", filename=log_file_path,
                     format="%(levelname)s:%(asctime)s %(message)s %(lineno)s")
