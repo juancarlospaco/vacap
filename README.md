@@ -25,7 +25,8 @@ http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-m
 http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
 
 
-Crear un archivo .bat para iniciar "vacap"
+
+**Crear un archivo .bat para iniciar "vacap"**
 
 con las siguientes lineas:
   
@@ -33,5 +34,6 @@ con las siguientes lineas:
   
   Si se quiere se puede anclar en el menu inicio para tenerlo a mano.
   
+  Aparecerá al lado del reloj un icono con un disco, haciendo click derecho, comienza a ejecutarse el backup.
 
 
