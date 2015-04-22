@@ -15,7 +15,6 @@
 # Configurar:
 MAKE_BACKUP_FROM = [
     r"C:\Python34",
-    r"C:\Qt",
     r"",
 ]
 SAVE_BACKUP_TO = ""
