@@ -26,7 +26,7 @@ http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.
 
 **Editar el archivo vacap.py** 
 
-Especificar el path del archivo que se va a guardar y el path de destino, donde se guardaran.
+Especificar el path de la carpeta de la que se hará la copia de seguridad. Y el path de la carpeta donde se van a guardar las copias.
 
 
 
