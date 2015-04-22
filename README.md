@@ -28,7 +28,9 @@ http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.
 Crear un archivo .bat para iniciar "vacap"
 
 con las siguientes lineas:
+  
   "C:\Python34\python.exe" "C:\....<path donde hayas guardado el arch vacap.py>"
+  
   Si se quiere se puede anclar en el menu inicio para tenerlo a mano.
   
 
