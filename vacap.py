@@ -108,7 +108,7 @@ class Backuper(QProgressDialog):
         screen = QApplication.desktop().screenNumber(mousepointer_position)
         centerPoint = QApplication.desktop().screenGeometry(screen).center()
         window_geometry.moveCenter(centerPoint)
-        return bool(not self.move(window_geometry.topLeft()))
+        self.move(window_geometry.topLeft())
 
     def closeEvent(self, event):
         """Force NO Quit."""
@@ -138,12 +138,14 @@ class Backuper(QProgressDialog):
         log.info("Checking if {} has Free Space.".format(self.destination))
         free_space_on_disk = get_free_space_on_disk_on_gb(self.destination)
         size_of_the_zip_file = os.stat(filename).st_size / 1024 / 1024 / 1024
+        log.info("Free Space: ~{} GigaBytes.".format(free_space_on_disk))
+        log.info("Size of ZIP: ~{} GigaBytes.".format(size_of_the_zip_file))
         if free_space_on_disk > size_of_the_zip_file:
             log.info("Copying to destination: {}".format(self.destination))
             stored_zip_file = copy2(filename, self.destination)
             log.info("ZIP file archived as {}.".format(stored_zip_file))
             try:
-                log.info("Generating SHA1 Checksum hidden file.")
+                log.info("Generating SHA1 Checksum *.BAT hidden file.")
                 self.generate_checksum(stored_zip_file)
             except Exception as reason:
                 log.warning(reason)
@@ -156,14 +158,17 @@ class Backuper(QProgressDialog):
         os.chmod(filename, S_IREAD)
         with open(filename, "rb") as zip_file:
             checksum = sha1(zip_file.read()).hexdigest()
-            log.info("Calculating SHA1 Checksum: {}".format(checksum))
+            log.info("SHA1 Checksum: {}".format(checksum))
         checksum_file = filename + ".bat"
         with open(checksum_file, "w") as checksum_filename:
-            checksum_filename.write(("echo Valid SHA1 Checksum: {}"
-                "certutil -hashfile '{}' sha1").format(checksum, filename))
+            checksum_filename.write("""@echo off
+                echo Valid SHA1 Checksum: {}
+                certutil -hashfile "{}" SHA1""".format(checksum, filename))
         log.info("Making SHA1 Checksum *.BAT {} Hidden".format(checksum_file))
         ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
                                                   0x02)  # make hidden file
+        log.info("Making {} Read-Only.".format(checksum_file))
+        os.chmod(checksum_file, S_IREAD)
 
     def make_zip(self):
         """Try to make a ZIP file."""
