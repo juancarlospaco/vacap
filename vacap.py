@@ -38,19 +38,18 @@ import ctypes
 import logging as log
 import os
 import platform
+import shutil
 import signal
 import sys
 import time
 from datetime import datetime
 from hashlib import sha1
-from shutil import copy2, make_archive
 from stat import S_IREAD
 from tempfile import gettempdir
 
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
-from PyQt5.QtCore import QTimer
 
 
 ##############################################################################
@@ -68,7 +67,7 @@ def get_free_space_on_disk_on_gb(folder):
         free_space_on_disk_on_gb = free_bytes.value / 1024 / 1024 / 1024
     else:
         stat_folder = os.statvfs(folder)
-        fsize_to_gb = stat_folder.f_frsize / 1024 / 1024/ 1024
+        fsize_to_gb = stat_folder.f_frsize / 1024 / 1024 / 1024
         free_space_on_disk_on_gb = stat_folder.f_bavail * fsize_to_gb
     return int(free_space_on_disk_on_gb)
 
@@ -83,9 +82,7 @@ class Backuper(QProgressDialog):
         self.setWindowTitle(__doc__)
         self.setWindowIcon(
             QIcon(QApplication.style().standardPixmap(QStyle.SP_DriveFDIcon)))
-        # self.setWindowFlags(Qt.Window |  Qt.CustomizeWindowHint |
-        #                    Qt.WindowTitleHint | Qt::WindowMinMaxButtonsHint)
-        # Qt.FramelessWindow
+        self.setWindowFlags(0x00000800)  # Qt.FramelessWindowHint
         self.setCancelButton(None)
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self.destination, self.origins = destination, origins
@@ -102,10 +99,7 @@ class Backuper(QProgressDialog):
         self.center()
         self.setValue(0)
         self.setLabelText(self.template)
-        self._timer = QTimer(self)
-        self._timer.setSingleShot(True)
-        self._timer.timeout.connect(self.make_backup)
-        self._timer.start(1000)
+        self.make_backup()
 
     def center(self):
         """Center the Window on Current Screen,with MultiMonitor support."""
@@ -139,8 +133,8 @@ class Backuper(QProgressDialog):
         """Try to make backups."""
         self.make_zip()
 
-    def copy_zip(self, filename):
-        """Try to copy ZIP file to final destination."""
+    def move_zip(self, filename):
+        """Try to move ZIP file to final destination."""
         log.info("Checking if {} has Free Space.".format(self.destination))
         free_space_on_disk = get_free_space_on_disk_on_gb(self.destination)
         size_of_the_zip_file = int(os.stat(filename).st_size
@@ -149,7 +143,7 @@ class Backuper(QProgressDialog):
         log.info("Size of ZIP: ~{} GigaBytes.".format(size_of_the_zip_file))
         if free_space_on_disk > size_of_the_zip_file:
             log.info("Copying to destination: {}".format(self.destination))
-            stored_zip_file = copy2(filename, self.destination)
+            stored_zip_file = shutil.move(filename, self.destination)
             log.info("ZIP file archived as {}.".format(stored_zip_file))
             try:
                 log.info("Generating SHA1 Checksum *.BAT hidden file.")
@@ -191,10 +185,11 @@ class Backuper(QProgressDialog):
                     len(self.origins) - self.origins.index(folder_to_backup),
                     percentage))
                 self.setValue(percentage)
+                QApplication.processEvents()  # Forces the UI to Update
                 log.info("Folder to backup: {}.".format(folder_to_backup))
-                make_archive(folder_to_backup, "zip", folder_to_backup,
-                             logger=log)
-                self.copy_zip(folder_to_backup + ".zip")
+                shutil.make_archive(folder_to_backup, "zip",
+                                    folder_to_backup, logger=log)
+                self.move_zip(folder_to_backup + ".zip")
         except Exception as reason:
             log.warning(reason)
         else:
