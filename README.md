@@ -12,7 +12,7 @@ Hay que tener en cuenta, que OS se está utilizando su arquitectura y versión. 
 
 Por ejemplo para un Win 7 x86 se deberían bajar "Windows x86 MSI installer" del siquiente limk:
 
-https://www.python.org/ftp/python/3.4.3/python-3.4.3.msi
+ https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
 
 
 
@@ -25,5 +25,11 @@ http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-m
 http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
 
 
+Crear un archivo .bat para iniciar "vacap"
+
+con las siguientes lineas:
+  "C:\Python34\python.exe" "C:\....<path donde hayas guardado el arch vacap.py>"
+  Si se quiere se puede anclar en el menu inicio para tenerlo a mano.
+  
 
 
