@@ -159,8 +159,8 @@ class Backuper(QProgressDialog):
             log.info("Calculating SHA1 Checksum: {}".format(checksum))
         checksum_file = filename + ".bat"
         with open(checksum_file, "w") as checksum_filename:
-            checksum_filename.write("""echo Valid SHA1 Checksum: {}
-                certutil -hashfile '{}' sha1""".format(filename, checksum))
+            checksum_filename.write(("echo Valid SHA1 Checksum: {}"
+                "certutil -hashfile '{}' sha1").format(checksum, filename))
         log.info("Making SHA1 Checksum *.BAT {} Hidden".format(checksum_file))
         ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
                                                   0x02)  # make hidden file
