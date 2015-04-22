@@ -24,7 +24,9 @@ http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-m
 
 http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
 
+**Editar el archivo vacap.py** 
 
+Especificar el path del archivo que se va a guardar y el path de destino, donde se guardaran.
 
 
 
