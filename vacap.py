@@ -1,18 +1,23 @@
-#!/usr/bin/env python3
+#!C:/Python34/pythonw.exe
 # -*- coding: utf-8 -*-
+
+
 """Vacap."""
 
 
 ##############################################################################
 # Instalar:
-# https://www.python.org/downloads/windows  (Elejir Python 3.x.x)
-# http://www.qt.io/download-open-source     (Elejir Qt 5.x.x)
-# http://www.riverbankcomputing.com/software/pyqt/download5
+# https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
+# http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
+# http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
+#
+# Opcional: (Para chequear integridad de archivos ZIP con checksum SHA1)
+# http://www.microsoft.com/en-us/download/details.aspx?id=11533
 
 
 # Configurar:
 MAKE_BACKUP_FROM = [
-    "C:/Users/Administrator/Desktop",
+    "C:/Users/Administrador/Desktop",
     "",
 ]
 SAVE_BACKUP_TO = ""
@@ -23,7 +28,7 @@ SAVE_BACKUP_TO = ""
 
 # metadata
 __version__ = '0.0.1'
-__license__ = ' GPLv3+ LGPLv3+ '
+__license__ = ' BSD '
 __author__ = ' Juan Carlos '
 __email__ = ' juancarlospaco@gmail.com '
 __url__ = 'https://github.com/juancarlospaco/vacap'
@@ -32,13 +37,17 @@ __source__ = ('https://raw.githubusercontent.com/juancarlospaco/'
 
 
 # imports
+import ctypes
 import logging as log
 import os
+import platform
 import signal
 import sys
 import time
 from datetime import datetime
+from hashlib import sha1
 from shutil import copy2, make_archive
+from stat import S_IREAD
 from tempfile import gettempdir
 
 from PyQt5.QtGui import QFont, QIcon
@@ -46,7 +55,24 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
 
 
-#
+##############################################################################
+
+
+def get_free_space_on_disk_on_gb(folder):
+    """Return folder/drive free space (in GigaBytes)."""
+    if not os.path.isdir(folder):
+        return 0
+    if sys.platform.startswith("win"):
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(
+            ctypes.c_wchar_p(folder), None,
+            None, ctypes.pointer(free_bytes))
+        free_space_on_disk_on_gb = free_bytes.value / 1024 / 1024 / 1024
+    else:
+        stat_folder = os.statvfs(folder)
+        fsize_to_gb = stat_folder.f_frsize / 1024 / 1024/ 1024
+        free_space_on_disk_on_gb = stat_folder.f_bavail * fsize_to_gb
+    return int(free_space_on_disk_on_gb)
 
 
 class Backuper(QProgressDialog):
@@ -57,6 +83,12 @@ class Backuper(QProgressDialog):
         """Init class."""
         super(Backuper, self).__init__(parent)
         self.setWindowTitle(__doc__)
+        self.setWindowIcon(
+            QApplication.style().standardPixmap(QStyle.SP_DriveFDIcon))
+        # self.setWindowFlags(Qt.Window |  Qt.CustomizeWindowHint |
+        #                    Qt.WindowTitleHint | Qt::WindowMinMaxButtonsHint)
+        # Qt.FramelessWindow
+        self.setCancelButton(None)
         self._time, self._date = time.time(), datetime.now().isoformat()[:-7]
         self.destination, self.origins = destination, origins
         self.template = """<h3>Copia de Seguridad BackUp</h3><hr><table>
@@ -69,7 +101,21 @@ class Backuper(QProgressDialog):
         <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>
         <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
         self.show()
+        self.center()
         self.make_backup()
+
+    def center(self):
+        """Center the Window on Current Screen,with MultiMonitor support."""
+        window_geometry = self.frameGeometry()
+        mousepointer_position = QApplication.desktop().cursor().pos()
+        screen = QApplication.desktop().screenNumber(mousepointer_position)
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        window_geometry.moveCenter(centerPoint)
+        return bool(not self.move(window_geometry.topLeft()))
+
+    def closeEvent(self, event):
+        """Force NO Quit."""
+        return event.ignore()
 
     def seconds_time_to_human_str(self, time_on_seconds=0):
         """Calculate time, with precision from seconds to days."""
@@ -88,6 +134,40 @@ class Backuper(QProgressDialog):
 
     def make_backup(self):
         """Try to make backups."""
+        self.make_zip()
+
+    def copy_zip(self, filename):
+        """Try to copy ZIP file to final destination."""
+        log.info("Checking if {} has Free Space.".format(self.destination))
+        free_space_on_disk = get_free_space_on_disk_on_gb(self.destination)
+        size_of_the_zip_file = os.stat(filename).st_size / 1024 / 1024 / 1024
+        if free_space_on_disk > size_of_the_zip_file:
+            log.info("Copying to destination: {}".format(self.destination))
+            stored_zip_file = copy2(filename, self.destination)
+            log.info("ZIP file archived as {}.".format(stored_zip_file))
+            try:
+                log.info("Generating SHA1 Checksum hidden file.")
+                self.generate_checksum(stored_zip_file)
+            except Exception as reason:
+                log.warning(reason)
+        else:
+            log.critical("No more Free Space on Backup Destination folder.")
+
+    def generate_checksum(self, filename):
+        """Generate a checksum using SHA1."""
+        log.info("Making archived ZIP file Read-Only.")
+        os.chmod(filename, S_IREAD)
+        log.info("Calculating SHA1 Checksum from Data from ZIP file.")
+        with open(filename, "rb") as zip_file:
+            checksum = sha1(zip_file.read()).hexdigest()
+        checksum_file = checksum + ".sha1"  # filename IS the checksum hash
+        open(checksum_file, "w").close()  # Mimic Linux 'touch', empty file
+        log.info("Making SHA1 Checksum file Hidden.")
+        ctypes.windll.kernel32.SetFileAttributesW(checksum_file,
+                                                  0x02)  # make hidden file
+
+    def make_zip(self):
+        """Try to make a ZIP file."""
         try:
             # iterate over lists of folders to backup
             for folder_to_backup in self.origins:
@@ -100,11 +180,10 @@ class Backuper(QProgressDialog):
                     len(self.origins) - self.origins.index(folder_to_backup),
                     percentage))
                 self.setValue(percentage)
-                log.info("Folder to backup: {}".format(folder_to_backup))
+                log.info("Folder to backup: {}.".format(folder_to_backup))
                 make_archive(folder_to_backup, "zip", folder_to_backup,
                              logger=log)
-                log.info("Copying to destination: {}".format(self.destination))
-                copy2(folder_to_backup + ".zip", self.destination)
+                self.copy_zip(folder_to_backup + ".zip")
         except Exception as reason:
             log.warning(reason)
         else:
@@ -115,7 +194,7 @@ class Backuper(QProgressDialog):
                 self.origins, self.destination))
 
 
-#
+##############################################################################
 
 
 class MainWindow(QSystemTrayIcon):
@@ -129,8 +208,9 @@ class MainWindow(QSystemTrayIcon):
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
         traymenu = QMenu("Backup")
-        traymenu.addAction(" Hacer Backup ", lambda: self.backup())
-        traymenu.setFont(QFont('Verdana', 20))
+        traymenu.setIcon(icon)
+        traymenu.addAction(icon, "Hacer Backup", lambda: self.backup())
+        traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
         self.setContextMenu(traymenu)
         log.info("Inicio el programa Vacap.")
         self.show()
@@ -179,6 +259,7 @@ class MainWindow(QSystemTrayIcon):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
+
         if self.check_origins_folders():
             log.info("Starting to BackUp folders...")
             Backuper(destination=self.destination, origins=self.origins)
@@ -188,16 +269,20 @@ class MainWindow(QSystemTrayIcon):
             sys.exit(1)
 
 
-#
+##############################################################################
 
 
 def main():
     """Main Loop."""
-    log.basicConfig(
-        level=-1, format="%(levelname)s:%(asctime)s %(message)s %(lineno)s",
-        filemode="w", filename=os.path.join(gettempdir(), "vacap.log"))
+    os.setpriority(os.PRIO_PROCESS, os.getpid(), 20)  # I/O nice smooth
+    log_file_path = os.path.join(gettempdir(), "vacap.log")
+    log.basicConfig(level=-1, filemode="w", filename=log_file_path,
+                    format="%(levelname)s:%(asctime)s %(message)s %(lineno)s")
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
+    log.debug("LOG File: '{}'.".format(log_file_path))
+    log.debug("CONFIG: Make Backup from: {}.".format(MAKE_BACKUP_FROM))
+    log.debug("CONFIG: Save Backup to: {}.".format(SAVE_BACKUP_TO))
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName("vacap")
