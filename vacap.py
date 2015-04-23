@@ -244,6 +244,7 @@ class MainWindow(QSystemTrayIcon):
         add_to_startup()
         log.info("Inicio el programa Vacap.")
         self.show()
+        self.showMessage("Vacap", "Copia de Seguridad Backup funcionando.")
         if MAKE_BACKUP_ON_STARTUP:
             log.info("Running Backup on Start-Up.")
             self.backup()
@@ -252,7 +253,6 @@ class MainWindow(QSystemTrayIcon):
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.run_backup_by_hour)
             self.timer.start(3600000)  # 1 Hour on Milliseconds
-        self.showMessage("Vacap", "Copia de Seguridad Backup funcionando")
 
     def click_trap(self, value):
         if value == self.Trigger:  # left click
@@ -307,7 +307,6 @@ class MainWindow(QSystemTrayIcon):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
-
         if self.check_origins_folders():
             log.info("Starting to BackUp folders...")
             Backuper(destination=self.destination, origins=self.origins)
