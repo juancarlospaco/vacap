@@ -17,7 +17,7 @@ MAKE_BACKUP_FROM = [
     r"C:\Python34",
     r"",
 ]
-SAVE_BACKUP_TO = ""
+SAVE_BACKUP_TO = r""
 
 
 ##############################################################################
@@ -65,9 +65,9 @@ def get_free_space_on_disk_on_gb(folder):
 def add_to_startup():
     """Try to add itself to windows startup. Ugly but dont touch Registry."""
     log.debug("Try to add the App to MS Windows startup if needed...")
-    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.pyw" # Espanol Window
+    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.py" # Espanol Window
     if not os.path.isfile(path_to_vacap):
-        path_to_vacap = r"C:\Program Files\vacap\vacap.pyw"  # English Windows
+        path_to_vacap = r"C:\Program Files\vacap\vacap.py"  # English Windows
     path_to_python = shutil.which("python.exe")
     if not os.path.isfile(path_to_python) or "Python27" in path_to_python:
         path_to_python = r"C:\Python34\python.exe"  # Default path
@@ -310,6 +310,7 @@ def main():
     log.debug("LOG File: '{}'.".format(log_file_path))
     log.debug("CONFIG: Make Backup from: {}.".format(MAKE_BACKUP_FROM))
     log.debug("CONFIG: Save Backup to: {}.".format(SAVE_BACKUP_TO))
+    log.debug("Free Space: {}GigaBytes".format(get_free_space_on_disk_on_gb()))
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName("vacap")
