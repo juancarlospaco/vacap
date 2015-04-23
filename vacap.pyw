@@ -87,10 +87,10 @@ def add_to_startup():
     win_xp = r"C:\Documents and Settings\All Users\Start Menu\Programs\Startup"
     win_78 = r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
     win_78 = win_78.format(getuser())
-    if os.path.isdir(win_xp):
-        startup_folder = win_xp  # is windows ~XP
-    else:
+    if os.path.isdir(win_78):
         startup_folder = win_78  # is windows 7/8
+    else:
+        startup_folder = win_xp  # is windows ~XP
     # write a BAT file with command to startup vacap if it not exist
     bat_filename = os.path.join(startup_folder, "vacap.bat")
     log.debug("BAT path is: {}.".format(bat_filename))
