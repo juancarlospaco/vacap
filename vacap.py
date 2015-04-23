@@ -47,7 +47,7 @@ from stat import S_IREAD
 from tempfile import gettempdir
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QCursor
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
 
@@ -236,11 +236,14 @@ class MainWindow(QSystemTrayIcon):
         log.info("Iniciando el programa Vacap...")
         self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
         self.setToolTip(__doc__ + "\nClick Derecho y 'Hacer Backup'!")
-        traymenu = QMenu("Backup")
-        traymenu.setIcon(icon)
-        traymenu.addAction(icon, "Hacer Backup", lambda: self.backup())
-        traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
-        self.setContextMenu(traymenu)
+        self.traymenu = QMenu("Backup")
+        self.traymenu.setIcon(icon)
+        self.traymenu.addAction(icon, "Hacer Backup", lambda: self.backup())
+        self.traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
+        self.setContextMenu(self.traymenu)
+        self.activated.connect(self.click_trap)
+        QTimer.singleShot(500, lambda: self.showMessage(
+            "Vacap", "Copia de Seguridad Backup funcionando"))
         add_to_startup()
         log.info("Inicio el programa Vacap.")
         self.show()
@@ -252,6 +255,10 @@ class MainWindow(QSystemTrayIcon):
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.run_backup_by_hour)
             self.timer.start(3600000)  # 1 Hour on Milliseconds
+
+    def click_trap(self, value):
+        if value == self.Trigger:  # left click
+            self.traymenu.exec_(QCursor.pos())
 
     def run_backup_by_hour(self):
         """Run Automatic Backup if the actual Hour equals Scheduled Hour."""
