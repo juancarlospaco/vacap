@@ -242,8 +242,6 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
         self.setContextMenu(self.traymenu)
         self.activated.connect(self.click_trap)
-        QTimer.singleShot(500, lambda: self.showMessage(
-            "Vacap", "Copia de Seguridad Backup funcionando"))
         add_to_startup()
         log.info("Inicio el programa Vacap.")
         self.show()
@@ -255,6 +253,7 @@ class MainWindow(QSystemTrayIcon):
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.run_backup_by_hour)
             self.timer.start(3600000)  # 1 Hour on Milliseconds
+        self.showMessage("Vacap", "Copia de Seguridad Backup funcionando")
 
     def click_trap(self, value):
         if value == self.Trigger:  # left click
