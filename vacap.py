@@ -68,9 +68,9 @@ def add_to_startup():
     path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.py" # Espanol Window
     if not os.path.isfile(path_to_vacap):
         path_to_vacap = r"C:\Program Files\vacap\vacap.py"  # English Windows
-    path_to_python = shutil.which("python.exe")
-    if not os.path.isfile(path_to_python) or "Python27" in path_to_python:
-        path_to_python = r"C:\Python34\python.exe"  # Default path
+    path_to_python = r"C:\Python34\python.exe"  # Default path
+    if not os.path.isfile(path_to_python):
+        path_to_python = shutil.which("python.exe")  # Fallback path, check it.
     # the command to run vacap with full path to python and vacap
     bat_content = r'start "Vacap" /LOW "{}" "{}"'.format(path_to_python,
                                                     path_to_vacap)
