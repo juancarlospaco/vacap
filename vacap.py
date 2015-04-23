@@ -216,8 +216,7 @@ class Backuper(QProgressDialog):
         except Exception as reason:
             log.warning(reason)
         else:
-            QMessageBox.information(self, __doc__.title(),
-                                    "Copia de Seguridad Backup Termino bien.")
+            log.info("Copia de Seguridad Backup Termino bien.")
         finally:
             log.info("Finished BackUp from {} to {}.".format(
                 self.origins, self.destination))
@@ -313,6 +312,7 @@ class MainWindow(QSystemTrayIcon):
             log.info("Starting to BackUp folders...")
             Backuper(destination=self.destination, origins=self.origins)
             self.contextMenu().setDisabled(False)
+            self.showMessage("Vacap", "Copia de Seguridad Backup Termino bien")
         else:
             log.critical("Vacap is not properly configured, Exiting...")
             sys.exit(1)
