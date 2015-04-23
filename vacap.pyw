@@ -81,7 +81,8 @@ def add_to_startup():
     if not os.path.isfile(path_to_python) or "Python27" in path_to_python:
         path_to_python = r"C:\Python34\python.exe"  # Default path
     # the command to run vacap with full path to python and vacap
-    bat_content = r'"{}" "{}"'.format(path_to_python, path_to_vacap)
+    bat_content = r'start "Vacap" "{}" "{}"'.format(path_to_python,
+                                                    path_to_vacap)
     log.debug("Command for vacap is: {}.".format(bat_content))
     # find out which start folder exists, depends on windows versions
     win_xp = r"C:\Documents and Settings\All Users\Start Menu\Programs\Startup"
