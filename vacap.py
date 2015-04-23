@@ -58,17 +58,8 @@ def get_free_space_on_disk_on_gb(folder):
     """Return folder/drive free space (in GigaBytes)."""
     if not os.path.isdir(folder):
         return 0
-    if sys.platform.startswith("win"):
-        free_bytes = ctypes.c_ulonglong(0)
-        ctypes.windll.kernel32.GetDiskFreeSpaceExW(
-            ctypes.c_wchar_p(folder), None,
-            None, ctypes.pointer(free_bytes))
-        free_space_on_disk_on_gb = free_bytes.value / 1024 / 1024 / 1024
     else:
-        stat_folder = os.statvfs(folder)
-        fsize_to_gb = stat_folder.f_frsize / 1024 / 1024 / 1024
-        free_space_on_disk_on_gb = stat_folder.f_bavail * fsize_to_gb
-    return int(free_space_on_disk_on_gb)
+        return int(shutil.disk_usage(folder).free / 1024 / 1024 / 1024)
 
 
 def add_to_startup():
