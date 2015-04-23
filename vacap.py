@@ -18,6 +18,8 @@ MAKE_BACKUP_FROM = [
     r"",
 ]
 SAVE_BACKUP_TO = r""
+MAKE_BACKUP_ON_STARTUP = True
+MAKE_BACKUP_AT_THIS_HOURS = (12, 18)
 
 
 ##############################################################################
@@ -44,7 +46,7 @@ from hashlib import sha1
 from stat import S_IREAD
 from tempfile import gettempdir
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
                              QStyle, QSystemTrayIcon)
@@ -242,6 +244,19 @@ class MainWindow(QSystemTrayIcon):
         add_to_startup()
         log.info("Inicio el programa Vacap.")
         self.show()
+        if MAKE_BACKUP_ON_STARTUP:
+            log.info("Running Backup on Start-Up.")
+            self.backup()
+        if len(MAKE_BACKUP_AT_THIS_HOURS):
+            log.info("Running Automatic Backup by Scheduled Hours.")
+            self.timer = QTimer(self)
+            self.timer.timeout.connect(self.run_backup_by_hour)
+            self.timer.start(3600000)  # 1 Hour on Milliseconds
+
+    def run_backup_by_hour(self):
+        """Run Automatic Backup if the actual Hour equals Scheduled Hour."""
+        if datetime.now().hour in MAKE_BACKUP_AT_THIS_HOURS:
+            self.backup()
 
     def check_destination_folder(self):
         """Check destination folder."""
