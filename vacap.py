@@ -325,7 +325,8 @@ def main():
     log.debug("LOG File: '{}'.".format(log_file_path))
     log.debug("CONFIG: Make Backup from: {}.".format(MAKE_BACKUP_FROM))
     log.debug("CONFIG: Save Backup to: {}.".format(SAVE_BACKUP_TO))
-    log.debug("Free Space: {}GigaBytes".format(get_free_space_on_disk_on_gb()))
+    log.debug("Free Space on Disk: ~{} GigaBytes.".format(
+        get_free_space_on_disk_on_gb(os.path.expanduser("~"))))
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName("vacap")
