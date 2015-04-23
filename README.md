@@ -30,13 +30,11 @@ Especificar el path de la carpeta de la que se hará la copia de seguridad. Y el
 
 
 
-**Crear un archivo .bat para iniciar "vacap"**
+**Correr por primera vez en la consola**
 
-con las siguientes lineas:
+las siguientes lineas:
   
   - "C:\Python34\python.exe" "C:\.... '<path donde hayas guardado el arch vacap.py' "
-  
-  - Si se quiere se puede anclar en el menu inicio para tenerlo a mano.
   
   - Aparecerá al lado del reloj un icono con un disco, haciendo click derecho, comienza a ejecutarse el backup.
 
