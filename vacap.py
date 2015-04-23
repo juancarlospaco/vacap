@@ -219,11 +219,10 @@ class Backuper(QProgressDialog):
                 shutil.make_archive(folder_to_backup, "zip",
                                     folder_to_backup, logger=log)
                 self.move_zip(folder_to_backup + ".zip")
+            self.setValue(100)
         except Exception as reason:
             log.warning(reason)
         else:
-            self.setValue(100)
-            QApplication.processEvents()  # Forces the UI to Update
             QMessageBox.information(self, __doc__.title(),
                                     "Copia de Seguridad Backup Termino bien.")
         finally:
