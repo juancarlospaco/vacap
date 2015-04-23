@@ -43,6 +43,7 @@ from datetime import datetime
 from hashlib import sha1
 from stat import S_IREAD
 from tempfile import gettempdir
+from getpass import getuser
 
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
@@ -68,6 +69,34 @@ def get_free_space_on_disk_on_gb(folder):
         fsize_to_gb = stat_folder.f_frsize / 1024 / 1024 / 1024
         free_space_on_disk_on_gb = stat_folder.f_bavail * fsize_to_gb
     return int(free_space_on_disk_on_gb)
+
+
+def add_to_startup():
+    """Try to add itself to windows startup. Ugly but dont touch Registry."""
+    log.debug("Try to add the App to MS Windows startup if needed...")
+    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.py" # Espanol Windows
+    if not os.path.isfile(path_to_vacap):
+        path_to_vacap = r"C:\Program Files\vacap\vacap.py"  # English Windows
+    path_to_python = shutil.which("python.exe")
+    # the command to run vacap with full path to python and vacap
+    bat_content = r'"{}" "{}"'.format(path_to_python, path_to_vacap)
+    log.debug("Command for vacap is: {}.".format(bat_content))
+    # find out which start folder exists, depends on windows versions
+    win_xp = r"C:\Documents and Settings\All Users\Start Menu\Programs\Startup"
+    win_78 = r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
+    win_78 = win_78.format(getuser())
+    if os.path.isdir(win_xp):
+        startup_folder = win_xp  # is windows ~XP
+    else:
+        startup_folder = win_78  # is windows 7/8
+    # write a BAT file with command to startup vacap if it not exist
+    bat_filename = os.path.join(startup_folder, "vacap.bat")
+    log.debug("BAT path is: {}.".format(bat_filename))
+    if not os.path.isfile(bat_filename) and os.path.isdir(startup_folder):
+        with open(bat_filename, "w", encoding="utf-8") as bat_file:
+            bat_file.write(bat_content)
+    else:
+       log.debug("BAT file already exists.")
 
 
 class Backuper(QProgressDialog):
@@ -219,6 +248,7 @@ class MainWindow(QSystemTrayIcon):
         traymenu.addAction(icon, "Hacer Backup", lambda: self.backup())
         traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
         self.setContextMenu(traymenu)
+        add_to_startup()
         log.info("Inicio el programa Vacap.")
         self.show()
 
