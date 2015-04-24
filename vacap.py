@@ -18,7 +18,8 @@ MAKE_BACKUP_FROM = [
     r"",
 ]
 SAVE_BACKUP_TO = r""
-MAKE_BACKUP_ON_STARTUP = False
+MAKE_BACKUP_ON_STARTUP = True
+MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY = True
 MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 
@@ -325,6 +326,9 @@ class MainWindow(QSystemTrayIcon):
 
     def backup(self):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
+        if not MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY:
+            if windows_is_running_on_battery():
+                return
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
         if self.check_origins_folders():
