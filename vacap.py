@@ -19,17 +19,10 @@ MAKE_BACKUP_FROM = [
 ]
 SAVE_BACKUP_TO = r""
 MAKE_BACKUP_ON_STARTUP = True
-MAKE_BACKUP_AT_THIS_HOURS = (12, 18)
+MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 
 ##############################################################################
-
-
-# metadata
-__version__ = '0.0.1'
-__license__ = ' BSD '
-__author__ = ' Juan Carlos '
-__email__ = ' juancarlospaco@gmail.com '
 
 
 # imports
@@ -47,9 +40,9 @@ from stat import S_IREAD
 from tempfile import gettempdir
 
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont, QIcon, QCursor
-from PyQt5.QtWidgets import (QApplication, QMenu, QMessageBox, QProgressDialog,
-                             QStyle, QSystemTrayIcon)
+from PyQt5.QtGui import QCursor, QFont, QIcon
+from PyQt5.QtWidgets import (QApplication, QMenu, QProgressDialog, QStyle,
+                             QSystemTrayIcon)
 
 
 ##############################################################################
@@ -174,7 +167,7 @@ class Backuper(QProgressDialog):
             except Exception as reason:
                 log.warning(reason)
         else:
-            log.critical("No more Free Space on Backup Destination folder.")
+            log.critical("No Free Space on Backup Destination folder.")
 
     def generate_checksum(self, filename):
         """Generate a checksum using SHA1."""
@@ -261,6 +254,7 @@ class MainWindow(QSystemTrayIcon):
     def run_backup_by_hour(self):
         """Run Automatic Backup if the actual Hour equals Scheduled Hour."""
         if datetime.now().hour in MAKE_BACKUP_AT_THIS_HOURS:
+            log.info("Running Automatic Backup by Scheduled Hour.")
             self.backup()
 
     def check_destination_folder(self):
