@@ -18,7 +18,7 @@ MAKE_BACKUP_FROM = [
     r"",
 ]
 SAVE_BACKUP_TO = r""
-MAKE_BACKUP_ON_STARTUP = True
+MAKE_BACKUP_ON_STARTUP = False
 MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 
@@ -27,6 +27,7 @@ MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 # imports
 import ctypes
+from ctypes import wintypes
 import logging as log
 import os
 import shutil
@@ -49,12 +50,14 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QProgressDialog, QStyle,
 
 
 class SYSTEM_POWER_STATUS(ctypes.Structure):
-    _fields_ = [('ACLineStatus', ctypes.wintypes.c_ubyte),
-                ('BatteryFlag', ctypes.wintypes.c_ubyte),
-                ('BatteryLifePercent', ctypes.wintypes.c_ubyte),
-                ('Reserved1', ctypes.wintypes.c_ubyte),
-                ('BatteryLifeTime', ctypes.wintypes.DWORD),
-                ('BatteryFullLifeTime', ctypes.wintypes.DWORD)]
+
+    """CTypes Structure to find out if Windows system is running on battery."""
+
+    _fields_ = [
+        ('ACLineStatus', wintypes.BYTE), ('BatteryFlag', wintypes.BYTE),
+        ('BatteryLifePercent', wintypes.BYTE), ('Reserved1', wintypes.BYTE),
+        ('BatteryLifeTime', wintypes.DWORD),
+        ('BatteryFullLifeTime', wintypes.DWORD)]
 
 
 def windows_is_running_on_battery():
@@ -67,9 +70,7 @@ def windows_is_running_on_battery():
     if not GetSystemPowerStatus(ctypes.pointer(status)):
         log.critical(ctypes.WinError())
         return False
-    return bool(status.ACLineStatus)
-
-print("windows_running_on_battery: {}".format(windows_is_running_on_battery()))
+    return not bool(status.ACLineStatus)  # ACLineStatus = 1 is AC
 
 
 def get_free_space_on_disk_on_gb(folder):
@@ -272,6 +273,7 @@ class MainWindow(QSystemTrayIcon):
             self.timer.start(3600000)  # 1 Hour on Milliseconds
 
     def click_trap(self, value):
+        """Trap the mouse tight click."""
         if value == self.Trigger:  # left click
             self.traymenu.exec_(QCursor.pos())
 
@@ -350,6 +352,7 @@ def main():
     log.debug("CONFIG: Save Backup to: {}.".format(SAVE_BACKUP_TO))
     log.debug("Free Space on Disk: ~{} GigaBytes.".format(
         get_free_space_on_disk_on_gb(os.path.expanduser("~"))))
+    log.debug("Running on Battery: {}".format(windows_is_running_on_battery()))
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # CTRL+C work to quit app
     app = QApplication(sys.argv)
     app.setApplicationName("vacap")
