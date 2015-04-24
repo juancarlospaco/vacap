@@ -48,6 +48,30 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QProgressDialog, QStyle,
 ##############################################################################
 
 
+class SYSTEM_POWER_STATUS(ctypes.Structure):
+    _fields_ = [('ACLineStatus', ctypes.wintypes.c_ubyte),
+                ('BatteryFlag', ctypes.wintypes.c_ubyte),
+                ('BatteryLifePercent', ctypes.wintypes.c_ubyte),
+                ('Reserved1', ctypes.wintypes.c_ubyte),
+                ('BatteryLifeTime', ctypes.wintypes.DWORD),
+                ('BatteryFullLifeTime', ctypes.wintypes.DWORD)]
+
+
+def windows_is_running_on_battery():
+    """Try to find out if MS Windows is running on battery."""
+    SYSTEM_POWER_STATUS_P = ctypes.POINTER(SYSTEM_POWER_STATUS)
+    GetSystemPowerStatus = ctypes.windll.kernel32.GetSystemPowerStatus
+    GetSystemPowerStatus.argtypes = [SYSTEM_POWER_STATUS_P]
+    GetSystemPowerStatus.restype = wintypes.BOOL
+    status = SYSTEM_POWER_STATUS()
+    if not GetSystemPowerStatus(ctypes.pointer(status)):
+        log.critical(ctypes.WinError())
+        return False
+    return bool(status.ACLineStatus)
+
+print("windows_running_on_battery: {}".format(windows_is_running_on_battery()))
+
+
 def get_free_space_on_disk_on_gb(folder):
     """Return folder/drive free space (in GigaBytes)."""
     if not os.path.isdir(folder):
