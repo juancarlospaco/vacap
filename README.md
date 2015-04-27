@@ -26,7 +26,8 @@ http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.
 
 **Editar el archivo vacap.py** 
 
-Especificar el path de la carpeta de la que se hará la copia de seguridad. Y el path de la carpeta donde se van a guardar las copias.
+- Especificar los path absolutos entre comillas dobles de las carpetas de la que se hará la copia de seguridad.
+- Especificar el path absoluto entre comillas dobles de la carpeta donde se van a guardar las copias *(ZIP)*.
 
 
 
@@ -36,6 +37,4 @@ las siguientes lineas:
   
   - `"C:\Python34\python.exe" "C:\.... '<path donde hayas guardado el arch vacap.py'"`
   
-  - Aparecerá al lado del reloj un icono con un disco, haciendo click derecho, comienza a ejecutarse el backup.
-
-
+  - Aparecerá al lado del reloj un icono con un disco, haciendo click, comienza a ejecutarse el backup.
