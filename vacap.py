@@ -29,19 +29,19 @@ MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 # imports
 import ctypes
-from ctypes import wintypes
 import logging as log
 import os
 import shutil
 import signal
 import sys
 import time
+from calendar import week_day
+from ctypes import wintypes
 from datetime import datetime
 from getpass import getuser
 from hashlib import sha1
 from stat import S_IREAD
 from tempfile import gettempdir
-from calendar import week_day
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor, QFont, QIcon
