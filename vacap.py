@@ -70,7 +70,7 @@ CSS_STYLE = """
     QMenu, QProgressDialog {
         background-color: qlineargradient(
             spread: reflect, x1: 0.5, y1: 0.5, x2: 0, y2: 0,
-            stop: 0 ligthcyan, stop: 1 limegreen, stop: 1 skyblue);
+            stop: 0 lightcyan, stop: 1 limegreen, stop: 1 skyblue);
         border-left: 9px solid lightgreen;
     }
 """
