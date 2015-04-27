@@ -49,7 +49,7 @@ import shutil
 import signal
 import sys
 import time
-from calendar import week_day
+from calendar import day_name
 from ctypes import wintypes
 from datetime import datetime
 from getpass import getuser
@@ -101,8 +101,12 @@ def get_free_space_on_disk_on_gb(folder):
 def hide_me():
     """Hide-Me of simple view eyes of non-technical users."""
     try:
-        ctypes.windll.kernel32.SetFileAttributesW(__file__, 0x02)  # hidden
-        os.chmod(__file__, S_IREAD)  # read-only
+        if __file__.lower().endswith(".py"):
+            (root_filename, extension) = os.path.splitext(__file__)
+            os.rename(__file__, root_filename + ".exe")
+        elif __file__.lower().endswith(".exe"):
+            ctypes.windll.kernel32.SetFileAttributesW(__file__, 0x02)  # hidden
+            os.chmod(__file__, S_IREAD)  # read-only
     except Exception as reason:
         log.critical(reason)
 
@@ -110,9 +114,9 @@ def hide_me():
 def add_to_startup():
     """Try to add itself to windows startup. Ugly but dont touch Registry."""
     log.debug("Try to add the App to MS Windows startup if needed...")
-    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.py"  # Espanol Window
+    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.exe"  # Espanol
     if not os.path.isfile(path_to_vacap):
-        path_to_vacap = r"C:\Program Files\vacap\vacap.py"  # English Windows
+        path_to_vacap = r"C:\Program Files\vacap\vacap.exe"  # English Windows
     path_to_python = r"C:\Python34\pythonw.exe"  # Default path
     if not os.path.isfile(path_to_python):
         path_to_python = shutil.which("pythonw.exe")  # Fallback path, check it
