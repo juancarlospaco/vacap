@@ -23,6 +23,20 @@ MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY = True
 MAKE_BACKUP_ONLY_ON_WEEKENDS = True
 MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
+# MAKE_BACKUP_FROM lista con carpetas para backupear, ruta completa, minimo 1.
+# SAVE_BACKUP_TO carpeta donde guardar el backup, ruta completa, tipo string.
+# MAKE_BACKUP_ON_STARTUP si es True hace 1 Backup al inicio.
+# MAKE_BACKUP_ON_STARTUP si es False no hace nada.
+# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es True,
+#   hace Backups cuando la Notebook/NetBook esta corriendo en Bateria.
+# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es False,
+#   NO hace backups cuando la Notebook/NetBook esta corriendo en Bateria.
+# MAKE_BACKUP_AT_THIS_HOURS hace 1 Backup a esa hora del dia.
+# MAKE_BACKUP_AT_THIS_HOURS si esta Vacio ( , ) Deshabilita el Backup por Hora.
+# MAKE_BACKUP_ONLY_ON_WEEKENDS si es True hace Backup solo Sabados y Domingos.
+# MAKE_BACKUP_ONLY_ON_WEEKENDS si es False hace Backups solo los dias de semana
+#   que son Lunes, Martes, Miercoles, Jueves y Viernes unicamente.
+
 
 ##############################################################################
 
