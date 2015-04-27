@@ -20,6 +20,7 @@ MAKE_BACKUP_FROM = [
 SAVE_BACKUP_TO = r""
 MAKE_BACKUP_ON_STARTUP = True
 MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY = True
+MAKE_BACKUP_ONLY_ON_WEEKENDS = True
 MAKE_BACKUP_AT_THIS_HOURS = (12, )
 
 
@@ -40,6 +41,7 @@ from getpass import getuser
 from hashlib import sha1
 from stat import S_IREAD
 from tempfile import gettempdir
+from calendar import week_day
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor, QFont, QIcon
@@ -326,9 +328,14 @@ class MainWindow(QSystemTrayIcon):
 
     def backup(self):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
-        if not MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY:
-            if windows_is_running_on_battery():
-                return
+        if not MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY:  # if NOT backup on battery
+            if windows_is_running_on_battery():  # if is windows on battery ?
+                return  # if on battery and should not make backup, then return
+        _day = day_name[datetime.today().weekday()].lower()
+        if MAKE_BACKUP_ONLY_ON_WEEKENDS and _day not in ("saturday", "sunday"):
+            return  # if backup on weekend and day not (Sat,Sun), then return
+        if not MAKE_BACKUP_ONLY_ON_WEEKENDS and _day in ("saturday", "sunday"):
+            return  # if NOT backup on weekend and day in (Sat,Sun), return
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
         if self.check_origins_folders():
