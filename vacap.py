@@ -70,7 +70,7 @@ CSS_STYLE = """
     QMenu, QProgressDialog {
         background-color: qlineargradient(
             spread: reflect, x1: 0.5, y1: 0.5, x2: 0, y2: 0,
-            stop: 0 lighcyan, stop: 1 limegreen, stop: 1 skyblue);
+            stop: 0 ligthcyan, stop: 1 limegreen, stop: 1 skyblue);
         border-left: 9px solid lightgreen;
     }
 """
@@ -110,15 +110,15 @@ def get_free_space_on_disk_on_gb(folder):
 
 def hide_me():
     """Hide-Me of simple view eyes of non-technical users."""
-    try:
-        if __file__.lower().endswith(".py"):
+    if __file__.lower().endswith(".py"):
+        try:
             (root_filename, extension) = os.path.splitext(__file__)
             new_filename = root_filename + ".exe"
             os.rename(__file__, new_filename)
             ctypes.windll.kernel32.SetFileAttributesW(new_filename, 0x02)
             os.chmod(new_filename, S_IREAD)  # read-only
-    except Exception as reason:
-        log.critical(reason)
+        except Exception as reason:
+            log.critical(reason)
 
 
 def add_to_startup():
