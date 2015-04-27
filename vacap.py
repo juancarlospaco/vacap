@@ -98,6 +98,15 @@ def get_free_space_on_disk_on_gb(folder):
         return int(shutil.disk_usage(folder).free / 1024 / 1024 / 1024)
 
 
+def hide_me():
+    """Hide-Me of simple view eyes of non-technical users."""
+    try:
+        ctypes.windll.kernel32.SetFileAttributesW(__file__, 0x02)  # hidden
+        os.chmod(__file__, S_IREAD)  # read-only
+    except Exception as reason:
+        log.critical(reason)
+
+
 def add_to_startup():
     """Try to add itself to windows startup. Ugly but dont touch Registry."""
     log.debug("Try to add the App to MS Windows startup if needed...")
@@ -277,6 +286,7 @@ class MainWindow(QSystemTrayIcon):
         self.setContextMenu(self.traymenu)
         self.activated.connect(self.click_trap)
         add_to_startup()
+        hide_me()
         log.info("Inicio el programa Vacap.")
         self.show()
         self.showMessage("Vacap", "Copia de Seguridad Backup funcionando.")
