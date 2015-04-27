@@ -5,7 +5,7 @@ Es un sencillo y no por eso, menos potente gestor de backups, pensado para usuar
 
 Links para bajar paquetes necesarios: 
 
-Hay que tener en cuenta, que OS se está utilizando su arquitectura y versión. Iportante!!
+Hay que tener en cuenta, que OS se está utilizando su arquitectura y versión. Importante!!
 
 
 **Python 3.x.x**
@@ -34,7 +34,7 @@ Especificar el path de la carpeta de la que se hará la copia de seguridad. Y el
 
 las siguientes lineas:
   
-  - "C:\Python34\python.exe" "C:\.... '<path donde hayas guardado el arch vacap.py' "
+  - `"C:\Python34\python.exe" "C:\.... '<path donde hayas guardado el arch vacap.py'"`
   
   - Aparecerá al lado del reloj un icono con un disco, haciendo click derecho, comienza a ejecutarse el backup.
 
