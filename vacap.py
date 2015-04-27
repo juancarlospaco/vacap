@@ -66,6 +66,16 @@ from PyQt5.QtWidgets import (QApplication, QMenu, QProgressDialog, QStyle,
 ##############################################################################
 
 
+CSS_STYLE = """
+    QMenu, QProgressDialog {
+        background-color: qlineargradient(
+            spread: reflect, x1: 0.5, y1: 0.5, x2: 0, y2: 0,
+            stop: 0 lighcyan, stop: 1 limegreen, stop: 1 skyblue);
+        border-left: 9px solid lightgreen;
+    }
+"""
+
+
 class SYSTEM_POWER_STATUS(ctypes.Structure):
 
     """CTypes Structure to find out if Windows system is running on battery."""
@@ -166,6 +176,7 @@ class Backuper(QProgressDialog):
         <tr><td><b>Faltante:</b></td> <td>{}</td> <tr>
         <tr><td><b>Porcentaje:</b></td>     <td>{}%</td></table><hr>
         <i>Por favor no toque nada hasta que termine, proceso trabajando</i>"""
+        self.setStyleSheet(CSS_STYLE)
         self.show()
         self.center()
         self.setValue(0)
@@ -289,6 +300,7 @@ class MainWindow(QSystemTrayIcon):
         self.traymenu.setFont(QFont("Verdana", 10, QFont.Bold))
         self.setContextMenu(self.traymenu)
         self.activated.connect(self.click_trap)
+        self.contextMenu().setStyleSheet(CSS_STYLE)
         add_to_startup()
         hide_me()
         log.info("Inicio el programa Vacap.")
