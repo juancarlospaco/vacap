@@ -25,7 +25,8 @@ from tempfile import gettempdir
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor, QFont, QIcon
 from PyQt5.QtWidgets import (QApplication, QFileDialog, QInputDialog, QMenu,
-                             QProgressDialog, QStyle, QSystemTrayIcon)
+                             QMessageBox, QProgressDialog, QStyle,
+                             QSystemTrayIcon)
 
 
 ##############################################################################
@@ -80,18 +81,6 @@ def windows_is_running_on_battery():
     return not bool(status.ACLineStatus)  # ACLineStatus = 1 is AC
 
 
-class MultipleFilesDialog(QFileDialog):
-    def __init__(self, *args, **kwargs):
-        super(MultipleFilesDialog, self).__init__(*args, **kwargs)
-        self.setOption(QFileDialog.DontUseNativeDialog, True)
-        self.setFileMode(QFileDialog.ExistingFiles)
-        self.setDirectory(gettempdir())
-        self.setLabelText("<b>Seleccionar Multiples Carpetas !.")
-
-    def accept(self):
-        QFileDialog.accept(self)
-
-
 def get_or_set_config():
     """Get config if exist else Set config if not exist."""
     global config
@@ -100,22 +89,26 @@ def get_or_set_config():
     if not os.path.isfile(CONFIG_FILENAME):
         log.warning("Vacap Config File does not exist; Will try to create it.")
         msg = "<b>Hacer un Backup Copia de Seguridad al Iniciar la compu ?."
-        _st = QInputDialog.getItem(None, __doc__, msg, ["Si", "No"])[0] == "Si"
+        _st = QMessageBox.question(
+            None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No) == QMessageBox.Yes
         msg = "<b>Hacer Backup Copia de Seguridad si la compu esta a Bateria ?"
-        _bt = QInputDialog.getItem(None, __doc__, msg, ["Si", "No"])[0] == "Si"
-        msg = "<b>Que Dia de la Semana Hacer Backup Copia de Seguridad ?"
+        _bt = QMessageBox.question(
+            None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes) == QMessageBox.Yes
+        msg = "<b>Que Dia de la Semana Hacer Backup Copia de Seguridad ?."
         days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
-        _day = str(QInputDialog.getItem(None, __doc__, msg, days)[0]).lower()
-        msg = "<b>A que Hora del Dia hacer Hacer Backup Copia de Seguridad ?"
+        _day = str(QInputDialog.getItem(
+            None, __doc__, msg, days, 4, False)[0]).lower()
+        msg = "<b>A que Hora del Dia hacer Hacer Backup Copia de Seguridad ?."
         _hour = int(QInputDialog.getInt(None, __doc__, msg, 12, 1, 23)[0])
-        msg = "En que Carpeta Guardar el Backup Copia de Seguridad ?"
-        _trg = QFileDialog.getExistingDirectory(None, msg, gettempdir(), True)
-        msg = "De Carpetas hacer Backups Copias de Seguridad ?"
-        dialog = MultipleFilesDialog()
-        if dialog.exec_() == QFileDialog.Accepted:
-            _backup_from = list(set(dialog.selectedFiles()))
-        else:
-            _backup_from = []
+        msg = "<b>Agregar una Carpeta para hacer Backup Copia de Seguridad ?."
+        _backup_from = []
+        while QMessageBox.question(
+            None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes) == QMessageBox.Yes:
+            _backup_from += str(QFileDialog.getExistingDirectory(
+                None, __doc__, os.path.expanduser("~")))
         configura = {
             "MAKE_BACKUP_FROM": _backup_from,
             "SAVE_BACKUP_TO": _trg,
@@ -335,6 +328,7 @@ class MainWindow(QSystemTrayIcon):
         """Tray icon main widget."""
         super(MainWindow, self).__init__(icon, parent)
         log.info("Iniciando el programa Vacap...")
+        get_or_set_config()
         self.origins = config["MAKE_BACKUP_FROM"]
         self.destination = config["SAVE_BACKUP_TO, MAKE_BACKUP_FROM"]
         self.setToolTip(__doc__ + "\n1 Click y 'Hacer Backup'!")
@@ -346,8 +340,7 @@ class MainWindow(QSystemTrayIcon):
         self.activated.connect(self.click_trap)
         self.contextMenu().setStyleSheet(CSS_STYLE)
         add_to_startup()
-        hide_me()
-        get_or_set_config()
+        # hide_me()
         log.info("Inicio el programa Vacap.")
         self.show()
         self.showMessage("Vacap", "Copia de Seguridad Backup funcionando.")
@@ -442,8 +435,6 @@ def main():
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
     log.debug("LOG File: '{}'.".format(log_file_path))
-    log.debug("CONFIG: Backup from: {}.".format(config["MAKE_BACKUP_FROM"]))
-    log.debug("CONFIG: Save Backup to: {}.".format(config["SAVE_BACKUP_TO"]))
     log.debug("Free Space on Disk: ~{} GigaBytes.".format(
         get_free_space_on_disk_on_gb(os.path.expanduser("~"))))
     log.debug("Running on Battery: {}".format(windows_is_running_on_battery()))
