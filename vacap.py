@@ -5,42 +5,6 @@
 """Vacap."""
 
 
-##############################################################################
-# Instalar:
-# https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi
-# http://download.qt.io/official_releases/qt/5.4/5.4.1/qt-opensource-windows-x86-mingw491_opengl-5.4.1.exe
-# http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.4.1/PyQt5-5.4.1-gpl-Py3.4-Qt5.4.1-x32.exe
-
-
-# Configurar:
-MAKE_BACKUP_FROM = [
-    r"C:\Python34",
-    r"",
-]
-SAVE_BACKUP_TO = r""
-MAKE_BACKUP_ON_STARTUP = True
-MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY = False
-MAKE_BACKUP_ONLY_ON_WEEKENDS = False
-MAKE_BACKUP_AT_THIS_HOURS = (12, )
-
-# MAKE_BACKUP_FROM lista con carpetas para backupear, ruta completa, minimo 1.
-# SAVE_BACKUP_TO carpeta donde guardar el backup, ruta completa, tipo string.
-# MAKE_BACKUP_ON_STARTUP si es True hace 1 Backup al inicio.
-# MAKE_BACKUP_ON_STARTUP si es False no hace nada.
-# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es True,
-#   hace Backups cuando la Notebook/NetBook esta corriendo en Bateria.
-# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es False,
-#   NO hace backups cuando la Notebook/NetBook esta corriendo en Bateria.
-# MAKE_BACKUP_AT_THIS_HOURS hace 1 Backup a esa hora del dia.
-# MAKE_BACKUP_AT_THIS_HOURS si esta Vacio ( , ) Deshabilita el Backup por Hora.
-# MAKE_BACKUP_ONLY_ON_WEEKENDS si es True hace Backup solo Sabados y Domingos.
-# MAKE_BACKUP_ONLY_ON_WEEKENDS si es False hace Backups solo los dias de semana
-#   que son Lunes, Martes, Miercoles, Jueves y Viernes unicamente.
-
-
-##############################################################################
-
-
 # imports
 import ctypes
 import logging as log
@@ -54,18 +18,34 @@ from ctypes import wintypes
 from datetime import datetime
 from getpass import getuser
 from hashlib import sha1
+from json import dumps, loads
 from stat import S_IREAD
 from tempfile import gettempdir
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor, QFont, QIcon
-from PyQt5.QtWidgets import (QApplication, QMenu, QProgressDialog, QStyle,
-                             QSystemTrayIcon)
+from PyQt5.QtWidgets import (QApplication, QFileDialog, QInputDialog, QMenu,
+                             QProgressDialog, QStyle, QSystemTrayIcon)
 
 
 ##############################################################################
+# MAKE_BACKUP_FROM lista con carpetas para backupear, ruta completa, minimo 1.
+# SAVE_BACKUP_TO carpeta donde guardar el backup, ruta completa, tipo string.
+# MAKE_BACKUP_ON_STARTUP si es True hace 1 Backup al inicio.
+# MAKE_BACKUP_ON_STARTUP si es False no hace nada.
+# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es True,
+#   hace Backups cuando la Notebook/NetBook esta corriendo en Bateria.
+# MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY si es False,
+#   NO hace backups cuando la Notebook/NetBook esta corriendo en Bateria.
+# MAKE_BACKUP_AT_THIS_HOUR hace 1 Backup a esa hora del dia.
+# MAKE_BACKUP_AT_THIS_HOURS si esta Vacio ( , ) Deshabilita el Backup por Hora.
+# MAKE_BACKUP_ONLY_ON_WEEKENDS si es True hace Backup solo Sabados y Domingos.
+# MAKE_BACKUP_ONLY_ON_WEEKENDS si es False hace Backups solo los dias de semana
+#   que son Lunes, Martes, Miercoles, Jueves y Viernes unicamente.
 
 
+config = None
+CONFIG_FILENAME = os.path.join(os.path.expanduser("~"), "vacap_config.json")
 CSS_STYLE = """
     QMenu, QProgressDialog {
         background-color: qlineargradient(
@@ -98,6 +78,69 @@ def windows_is_running_on_battery():
         log.critical(ctypes.WinError())
         return False
     return not bool(status.ACLineStatus)  # ACLineStatus = 1 is AC
+
+
+class MultipleFilesDialog(QFileDialog):
+    def __init__(self, *args, **kwargs):
+        super(MultipleFilesDialog, self).__init__(*args, **kwargs)
+        self.setOption(QFileDialog.DontUseNativeDialog, True)
+        self.setFileMode(QFileDialog.ExistingFiles)
+        self.setDirectory(gettempdir())
+        self.setLabelText("<b>Seleccionar Multiples Carpetas !.")
+
+    def accept(self):
+        QFileDialog.accept(self)
+
+
+def get_or_set_config():
+    """Get config if exist else Set config if not exist."""
+    global config
+    log.debug("Vacap Config File: {}.".format(CONFIG_FILENAME))
+    # if config does not exist or cant be read then try to create it, ask user.
+    if not os.path.isfile(CONFIG_FILENAME):
+        log.warning("Vacap Config File does not exist; Will try to create it.")
+        msg = "<b>Hacer un Backup Copia de Seguridad al Iniciar la compu ?."
+        _st = QInputDialog.getItem(None, __doc__, msg, ["Si", "No"])[0] == "Si"
+        msg = "<b>Hacer Backup Copia de Seguridad si la compu esta a Bateria ?"
+        _bt = QInputDialog.getItem(None, __doc__, msg, ["Si", "No"])[0] == "Si"
+        msg = "<b>Que Dia de la Semana Hacer Backup Copia de Seguridad ?"
+        days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
+        _day = str(QInputDialog.getItem(None, __doc__, msg, days)[0]).lower()
+        msg = "<b>A que Hora del Dia hacer Hacer Backup Copia de Seguridad ?"
+        _hour = int(QInputDialog.getInt(None, __doc__, msg, 12, 1, 23)[0])
+        msg = "En que Carpeta Guardar el Backup Copia de Seguridad ?"
+        _trg = QFileDialog.getExistingDirectory(None, msg, gettempdir(), True)
+        msg = "De Carpetas hacer Backups Copias de Seguridad ?"
+        dialog = MultipleFilesDialog()
+        if dialog.exec_() == QFileDialog.Accepted:
+            _backup_from = list(set(dialog.selectedFiles()))
+        else:
+            _backup_from = []
+        configura = {
+            "MAKE_BACKUP_FROM": _backup_from,
+            "SAVE_BACKUP_TO": _trg,
+            "MAKE_BACKUP_ON_STARTUP": _st,
+            "MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY": _bt,
+            "MAKE_BACKUP_ON_WEEK_DAY": _day,
+            "MAKE_BACKUP_AT_THIS_HOUR": _hour,
+        }
+        config = dumps(configura, ensure_ascii=False, indent=4, sort_keys=True)
+        log.debug("Configuration: {}.".format(config))
+        with open(CONFIG_FILENAME, "w", encoding="utf-8") as _config:
+            _config.write(config)
+        try:
+            log.info("Making Config file {} Hidden".format(CONFIG_FILENAME))
+            ctypes.windll.kernel32.SetFileAttributesW(CONFIG_FILENAME,
+                                                      0x02)  # make hidden file
+            log.info("Making Config file {} ReadOnly.".format(CONFIG_FILENAME))
+            os.chmod(CONFIG_FILENAME, S_IREAD)  # make read-only
+        except Exception as reason:
+            log.critical(reason)
+    else:
+        log.debug("Reading/Parsing Config File: {}.".format(CONFIG_FILENAME))
+        with open(CONFIG_FILENAME, "r", encoding="utf-8") as _config:
+            config = loads(_config.read())
+    return config
 
 
 def get_free_space_on_disk_on_gb(folder):
@@ -292,7 +335,8 @@ class MainWindow(QSystemTrayIcon):
         """Tray icon main widget."""
         super(MainWindow, self).__init__(icon, parent)
         log.info("Iniciando el programa Vacap...")
-        self.destination, self.origins = SAVE_BACKUP_TO, MAKE_BACKUP_FROM
+        self.origins = config["MAKE_BACKUP_FROM"]
+        self.destination = config["SAVE_BACKUP_TO, MAKE_BACKUP_FROM"]
         self.setToolTip(__doc__ + "\n1 Click y 'Hacer Backup'!")
         self.traymenu = QMenu("Backup")
         self.traymenu.setIcon(icon)
@@ -303,13 +347,14 @@ class MainWindow(QSystemTrayIcon):
         self.contextMenu().setStyleSheet(CSS_STYLE)
         add_to_startup()
         hide_me()
+        get_or_set_config()
         log.info("Inicio el programa Vacap.")
         self.show()
         self.showMessage("Vacap", "Copia de Seguridad Backup funcionando.")
-        if MAKE_BACKUP_ON_STARTUP:
+        if config["MAKE_BACKUP_ON_STARTUP"]:
             log.info("Running Backup on Start-Up.")
             self.backup()
-        if len(MAKE_BACKUP_AT_THIS_HOURS):
+        if config["MAKE_BACKUP_AT_THIS_HOUR"]:
             log.info("Running Automatic Backup by Scheduled Hours.")
             self.timer = QTimer(self)
             self.timer.timeout.connect(self.run_backup_by_hour)
@@ -322,7 +367,7 @@ class MainWindow(QSystemTrayIcon):
 
     def run_backup_by_hour(self):
         """Run Automatic Backup if the actual Hour equals Scheduled Hour."""
-        if datetime.now().hour in MAKE_BACKUP_AT_THIS_HOURS:
+        if int(datetime.now().hour) == int(config["MAKE_BACKUP_AT_THIS_HOUR"]):
             log.info("Running Automatic Backup by Scheduled Hour.")
             self.backup()
 
@@ -368,14 +413,12 @@ class MainWindow(QSystemTrayIcon):
 
     def backup(self):
         """Backup desde MAKE_BACKUP_FROM hacia SAVE_BACKUP_TO."""
-        if not MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY:  # if NOT backup on battery
+        if not config["MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY"]:
             if windows_is_running_on_battery():  # if is windows on battery ?
                 return  # if on battery and should not make backup, then return
         _day = day_name[datetime.today().weekday()].lower()
-        if MAKE_BACKUP_ONLY_ON_WEEKENDS and _day not in ("saturday", "sunday"):
+        if config["MAKE_BACKUP_ON_WEEK_DAY"] != _day:
             return  # if backup on weekend and day not (Sat,Sun), then return
-        if not MAKE_BACKUP_ONLY_ON_WEEKENDS and _day in ("saturday", "sunday"):
-            return  # if NOT backup on weekend and day in (Sat,Sun), return
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
         if self.check_origins_folders():
@@ -399,8 +442,8 @@ def main():
     log.getLogger().addHandler(log.StreamHandler(sys.stderr))
     log.info(__doc__)
     log.debug("LOG File: '{}'.".format(log_file_path))
-    log.debug("CONFIG: Make Backup from: {}.".format(MAKE_BACKUP_FROM))
-    log.debug("CONFIG: Save Backup to: {}.".format(SAVE_BACKUP_TO))
+    log.debug("CONFIG: Backup from: {}.".format(config["MAKE_BACKUP_FROM"]))
+    log.debug("CONFIG: Save Backup to: {}.".format(config["SAVE_BACKUP_TO"]))
     log.debug("Free Space on Disk: ~{} GigaBytes.".format(
         get_free_space_on_disk_on_gb(os.path.expanduser("~"))))
     log.debug("Running on Battery: {}".format(windows_is_running_on_battery()))
