@@ -333,7 +333,7 @@ class MainWindow(QSystemTrayIcon):
         log.info("Iniciando el programa Vacap...")
         get_or_set_config()
         self.origins = config["MAKE_BACKUP_FROM"]
-        self.destination = config["SAVE_BACKUP_TO, MAKE_BACKUP_FROM"]
+        self.destination = config["SAVE_BACKUP_TO"]
         self.setToolTip(__doc__ + "\n1 Click y 'Hacer Backup'!")
         self.traymenu = QMenu("Backup")
         self.traymenu.setIcon(icon)
