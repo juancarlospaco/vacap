@@ -102,15 +102,16 @@ def get_or_set_config():
             None, __doc__, msg, days, 4, False)[0]).lower()
         msg = "<b>A que Hora del Dia hacer Hacer Backup Copia de Seguridad ?."
         _hour = int(QInputDialog.getInt(None, __doc__, msg, 12, 1, 23)[0])
-        msg = "<b>En que Carpeta Guardar el Backup Copia de Seguridad ?."
+        msg = "<b>Donde Guardar el Backup Copia de Seguridad ?."
+        QMessageBox.information(None, __doc__, msg)
         _trg = QFileDialog.getExistingDirectory(None, __doc__, gettempdir())
         msg = "<b>Agregar 1 Carpeta para hacer Backup Copia de Seguridad ?."
         _backup_from = []
         while QMessageBox.question(
             None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes) == QMessageBox.Yes:
-            _backup_from += str(QFileDialog.getExistingDirectory(
-                None, __doc__, os.path.expanduser("~")))
+            _backup_from.append(str(QFileDialog.getExistingDirectory(
+                None, __doc__, os.path.expanduser("~"))))
         configura = {
             "MAKE_BACKUP_FROM": _backup_from,
             "SAVE_BACKUP_TO": _trg,
