@@ -109,7 +109,7 @@ def get_or_set_config():
         _backup_from = []
         while QMessageBox.question(
             None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.Yes) == QMessageBox.Yes:
+                QMessageBox.Yes) == QMessageBox.Yes:
             _backup_from.append(str(QFileDialog.getExistingDirectory(
                 None, __doc__, os.path.expanduser("~"))))
         configura = {
@@ -145,19 +145,6 @@ def get_free_space_on_disk_on_gb(folder):
         return 0
     else:
         return int(shutil.disk_usage(folder).free / 1024 / 1024 / 1024)
-
-
-def hide_me():
-    """Hide-Me of simple view eyes of non-technical users."""
-    if __file__.lower().endswith(".py"):
-        try:
-            (root_filename, extension) = os.path.splitext(__file__)
-            new_filename = root_filename + ".exe"
-            os.rename(__file__, new_filename)
-            ctypes.windll.kernel32.SetFileAttributesW(new_filename, 0x02)
-            os.chmod(new_filename, S_IREAD)  # read-only
-        except Exception as reason:
-            log.critical(reason)
 
 
 def add_to_startup():
@@ -343,7 +330,6 @@ class MainWindow(QSystemTrayIcon):
         self.activated.connect(self.click_trap)
         self.contextMenu().setStyleSheet(CSS_STYLE)
         add_to_startup()
-        # hide_me()
         log.info("Inicio el programa Vacap.")
         self.show()
         self.showMessage("Vacap", "Copia de Seguridad Backup funcionando.")
@@ -365,6 +351,10 @@ class MainWindow(QSystemTrayIcon):
         """Run Automatic Backup if the actual Hour equals Scheduled Hour."""
         if int(datetime.now().hour) == int(config["MAKE_BACKUP_AT_THIS_HOUR"]):
             log.info("Running Automatic Backup by Scheduled Hour.")
+            _day = day_name[datetime.today().weekday()].lower()
+            if config["MAKE_BACKUP_ON_WEEK_DAY"] != _day:
+                log.info("Skipping Automatic Backup by Scheduled Week Day.")
+                return  # if backup on weeke day not equals today, then return
             self.backup()
 
     def check_destination_folder(self):
@@ -412,9 +402,6 @@ class MainWindow(QSystemTrayIcon):
         if not config["MAKE_BACKUP_WHEN_RUNNING_ON_BATTERY"]:
             if windows_is_running_on_battery():  # if is windows on battery ?
                 return  # if on battery and should not make backup, then return
-        _day = day_name[datetime.today().weekday()].lower()
-        if config["MAKE_BACKUP_ON_WEEK_DAY"] != _day:
-            return  # if backup on weekend and day not (Sat,Sun), then return
         self.contextMenu().setDisabled(True)
         self.check_destination_folder()
         if self.check_origins_folders():
