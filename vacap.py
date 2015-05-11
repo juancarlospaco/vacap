@@ -85,9 +85,12 @@ def get_or_set_config():
     """Get config if exist else Set config if not exist."""
     global config
     log.debug("Vacap Config File: {}.".format(CONFIG_FILENAME))
+    days = ["Lunes", "Martes", "Miercoles",
+            "Jueves", "Viernes", "Sabado", "Domingo"]
     # if config does not exist or cant be read then try to create it, ask user.
     if not os.path.isfile(CONFIG_FILENAME):
         log.warning("Vacap Config File does not exist; Will try to create it.")
+        QMessageBox.information(None, __doc__, "<b>Vamos a Configurar Vacap!.")
         msg = "<b>Hacer un Backup Copia de Seguridad al Iniciar la compu ?."
         _st = QMessageBox.question(
             None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
@@ -97,7 +100,6 @@ def get_or_set_config():
             None, __doc__, msg, QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes) == QMessageBox.Yes
         msg = "<b>Que Dia de la Semana Hacer Backup Copia de Seguridad ?."
-        days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
         _day = str(QInputDialog.getItem(
             None, __doc__, msg, days, 4, False)[0]).lower()
         msg = "<b>A que Hora del Dia hacer Hacer Backup Copia de Seguridad ?."
@@ -122,16 +124,21 @@ def get_or_set_config():
         }
         config = dumps(configura, ensure_ascii=False, indent=4, sort_keys=True)
         log.debug("Configuration: {}.".format(config))
-        with open(CONFIG_FILENAME, "w", encoding="utf-8") as _config:
-            _config.write(config)
-        try:
-            log.info("Making Config file {} Hidden".format(CONFIG_FILENAME))
-            ctypes.windll.kernel32.SetFileAttributesW(CONFIG_FILENAME,
-                                                      0x02)  # make hidden file
-            log.info("Making Config file {} ReadOnly.".format(CONFIG_FILENAME))
-            os.chmod(CONFIG_FILENAME, S_IREAD)  # make read-only
-        except Exception as reason:
-            log.critical(reason)
+        confirm = QInputDialog.getMultiLineText(
+            None, __doc__, "<b>Resumen Final de la Configuracion:", config)[1]
+        if confirm:
+            with open(CONFIG_FILENAME, "w", encoding="utf-8") as _config:
+                _config.write(config)
+            try:
+                log.info("Making Config {} Hidden".format(CONFIG_FILENAME))
+                ctypes.windll.kernel32.SetFileAttributesW(CONFIG_FILENAME,
+                                                          0x02)  # hidden file
+                log.info("Making Config {} ReadOnly.".format(CONFIG_FILENAME))
+                os.chmod(CONFIG_FILENAME, S_IREAD)  # make read-only
+            except Exception as reason:
+                log.critical(reason)
+        else:
+            return get_or_set_config()
     else:
         log.debug("Reading/Parsing Config File: {}.".format(CONFIG_FILENAME))
         with open(CONFIG_FILENAME, "r", encoding="utf-8") as _config:
