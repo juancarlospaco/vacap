@@ -325,6 +325,7 @@ class MainWindow(QSystemTrayIcon):
         """Tray icon main widget."""
         super(MainWindow, self).__init__(icon, parent)
         log.info("Iniciando el programa Vacap...")
+        global config
         get_or_set_config()
         self.origins = config["MAKE_BACKUP_FROM"]
         self.destination = config["SAVE_BACKUP_TO"]
