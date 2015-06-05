@@ -45,6 +45,15 @@ from PyQt5.QtWidgets import (QApplication, QFileDialog, QInputDialog, QMenu,
 #   que son Lunes, Martes, Miercoles, Jueves y Viernes unicamente.
 
 
+# metadata
+"""Vacap."""
+__version__ = '1.0.0'
+__license__ = 'Other'
+__author__ = ' Juan Carlos '
+__email__ = ' juancarlospaco@gmail.com '
+__url__ = ''
+
+
 config = None
 CONFIG_FILENAME = os.path.join(os.path.expanduser("~"), "vacap_config.json")
 CSS_STYLE = """
