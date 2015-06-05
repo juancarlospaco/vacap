@@ -166,9 +166,7 @@ def get_free_space_on_disk_on_gb(folder):
 def add_to_startup():
     """Try to add itself to windows startup. Ugly but dont touch Registry."""
     log.debug("Try to add the App to MS Windows startup if needed...")
-    path_to_vacap = r"C:\Archivos de Programa\vacap\vacap.exe"  # Espanol
-    if not os.path.isfile(path_to_vacap):
-        path_to_vacap = r"C:\Program Files\vacap\vacap.exe"  # English Windows
+    path_to_vacap = r"C:\Python34\Scripts\vacap.py"  # Espanol
     path_to_python = r"C:\Python34\pythonw.exe"  # Default path
     if not os.path.isfile(path_to_python):
         path_to_python = shutil.which("pythonw.exe")  # Fallback path, check it
